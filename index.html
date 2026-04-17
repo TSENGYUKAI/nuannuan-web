@@ -5,41 +5,87 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   
-  <!-- SEO 優化標籤 -->
-  <title>暖暖有限公司附設彰化縣私立暖暖居家長照機構 - 專業居家服務與試算</title>
-  <meta name="description" content="暖暖有限公司附設彰化縣私立暖暖居家長照機構提供彰化縣大城鄉專業居家服務，由專業社工師帶領。立案字號：府授衛長字第1150109649號。">
+  <title>暖暖居家 - 專業長照 3.0 服務項目與費用試算</title>
+  <meta name="description" content="暖暖有限公司附設彰化縣私立暖暖居家長照機構，由專業社工師帶領，提供包含照顧及專業服務、交通接送、輔具環境改善及喘息服務之完整長照資訊。">
   
-  <!-- 載入核心庫 -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <style>
-    body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; -webkit-tap-highlight-color: transparent; }
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+
+    body { 
+      font-family: 'Noto Sans TC', sans-serif; 
+      -webkit-tap-highlight-color: transparent;
+      background-color: #FFF9F2;
+      overflow-x: hidden;
+    }
+    
     .custom-scrollbar::-webkit-scrollbar { width: 4px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #ED7D31; border-radius: 10px; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
-    .animate-pulse-fast { animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
     
-    /* 隱藏數字輸入框的上下箭頭 */
+    @keyframes fade-in-down {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes sun-shine {
+      0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+      50% { transform: scale(1.05) rotate(10deg); opacity: 0.8; }
+    }
+
+    .animate-page { animation: fade-in-down 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+    .animate-sun { animation: sun-shine 5s ease-in-out infinite; }
+
     input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button { 
-      -webkit-appearance: none; 
-      margin: 0; 
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
     }
-    input[type=number] {
-      -moz-appearance: textfield;
+    
+    .q-rounded { border-radius: 40px; }
+    .q-card {
+      background: white;
+      border-radius: 40px;
+      border: 4px solid #FDE6D2;
+      box-shadow: 0 15px 30px -10px rgba(237, 125, 49, 0.1);
+      transition: all 0.3s ease;
     }
+
+    .hero-gradient {
+      background: radial-gradient(circle at 70% 30%, #FFF2E6 0%, #FFF9F2 100%);
+    }
+
+    .step-number {
+      background: white;
+      border: 3px solid #ED7D31;
+      color: #ED7D31;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+      background: white;
+      border-radius: 20px;
+    }
+    
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px; border: 1px solid #FDE6D2; text-align: center; font-size: 13px; }
+    th { background: #FFF4ED; color: #ED7D31; font-weight: 900; }
   </style>
 </head>
-<body class="bg-stone-50">
+<body class="text-stone-700">
   
   <div id="root">
     <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh;">
-      <div style="width: 50px; height: 50px; border-radius: 50%; background-color: #ED7D31; margin-bottom: 20px;" class="animate-pulse-fast"></div>
-      <h2 style="color: #ED7D31; font-weight: bold; font-size: 1rem;">暖暖居家載入中...</h2>
+      <div style="width: 50px; height: 50px; border-radius: 50%; background-color: #ED7D31; margin-bottom: 20px;" class="animate-pulse shadow-xl shadow-orange-200"></div>
+      <h2 style="color: #ED7D31; font-weight: bold;">陽光灑落中...</h2>
     </div>
   </div>
 
@@ -49,6 +95,7 @@
     // --- 靜態資料定義 ---
     const fullBrandName = "暖暖有限公司附設彰化縣私立暖暖居家長照機構";
     const lineUrl = "https://line.me/ti/p/@957jphho";
+    
     const levelData = {
       '2': { subsidy: 10020, respite: 32340, short: 87780 },
       '3': { subsidy: 15460, respite: 32340, short: 87780 },
@@ -59,64 +106,127 @@
       '8': { subsidy: 36180, respite: 48510, short: 71610 },
     };
 
-    const serviceItems = [
-      { code: 'BA01', name: '基本身體清潔', price: 260 },
-      { code: 'BA02', name: '基本日常照顧(30分)', price: 195 },
-      { code: 'BA03', name: '測量生命徵象', price: 35 },
-      { code: 'BA04', name: '協助餵食或灌食', price: 130 },
-      { code: 'BA05', name: '餐食照顧', price: 310 },
-      { code: 'BA07', name: '協助沐浴及洗頭', price: 325 },
-      { code: 'BA08', name: '足部照護', price: 500 },
-      { code: 'BA10', name: '翻身拍背', price: 155 },
-      { code: 'BA11', name: '肢體關節活動', price: 195 },
-      { code: 'BA12', name: '協助上(下)樓梯', price: 130 },
-      { code: 'BA13', name: '陪同外出(30分)', price: 195 },
-      { code: 'BA14', name: '陪同就醫(1.5hr)', price: 685 },
-      { code: 'BA15', name: '家務協助(30分)', price: 195 },
-      { code: 'BA16', name: '代購或代領或代送', price: 130 },
-      { code: 'BA17a', name: '人工氣道抽吸', price: 75 },
-      { code: 'BA17b', name: '口鼻抽吸', price: 65 },
-      { code: 'BA17c', name: '管路清潔', price: 50 },
-      { code: 'BA17d', name: '甘油球/血糖', price: 50 },
-      { code: 'BA17e', name: '依指示置入藥盒', price: 50 },
-      { code: 'BA18', name: '安全看視(30分)', price: 200 },
-      { code: 'BA20', name: '陪伴服務(30分)', price: 175 },
-      { code: 'BA22', name: '巡視服務', price: 130 },
-      { code: 'BA23', name: '協助洗頭(額外)', price: 200 },
-      { code: 'BA24', name: '協助排泄', price: 220 },
-      { code: 'GA09', name: '居家喘息(2hr)', price: 770 },
-      { code: 'SC09', name: '短照服務(2hr)', price: 770 },
+    const serviceCategories = [
+      {
+        id: "wallet1",
+        title: "第一包：照顧及專業服務",
+        code: "BA/CB/BD碼",
+        desc: "最核心的居家照護錢包。包含沐浴、進食、肢體活動等日常照顧，以及社區式服務交通接駁(BD03)，協助長輩往返日照中心或輔具中心。",
+        items: [
+          { code: 'BA01', name: '基本身體清潔', price: 260 },
+          { code: 'BA02', name: '基本日常照顧(30分)', price: 195 },
+          { code: 'BA03', name: '測量生命徵象', price: 35 },
+          { code: 'BA04', name: '協助餵食或灌食', price: 130 },
+          { code: 'BA05', name: '餐食照顧', price: 310 },
+          { code: 'BA07', name: '協助沐浴及洗頭', price: 325 },
+          { code: 'BA08', name: '足部照護', price: 500 },
+          { code: 'BA10', name: '翻身拍背', price: 155 },
+          { code: 'BA11', name: '肢體關節活動', price: 195 },
+          { code: 'BA12', name: '協助上(下)樓梯', price: 130 },
+          { code: 'BA13', name: '陪同外出(30分)', price: 195 },
+          { code: 'BA14', name: '陪同就醫(1.5hr)', price: 685 },
+          { code: 'BA15', name: '家務協助(30分)', price: 195 },
+          { code: 'BA16', name: '代購或代領或代送', price: 130 },
+          { code: 'BA17a', name: '人工氣道抽吸', price: 75 },
+          { code: 'BA17b', name: '口鼻抽吸', price: 65 },
+          { code: 'BA17c', name: '管路清潔', price: 50 },
+          { code: 'BA17d', name: '甘油球/血糖', price: 50 },
+          { code: 'BA17e', name: '依指示置入藥盒', price: 50 },
+          { code: 'BA18', name: '安全看視(30分)', price: 200 },
+          { code: 'BA20', name: '陪伴服務(30分)', price: 175 },
+          { code: 'BA22', name: '巡視服務', price: 130 },
+          { code: 'BA23', name: '協助洗頭(額外)', price: 200 },
+          { code: 'BA24', name: '協助排泄', price: 220 },
+        ]
+      },
+      {
+        id: "wallet2",
+        title: "第二包：交通接送服務",
+        code: "DA碼",
+        desc: "往返居家至醫療院所就醫、定期式復健或透析治療。民眾每月給付額度依轄區類別為 $1,680 至 $2,400 不等。",
+        items: []
+      },
+      {
+        id: "wallet3",
+        title: "第三包：輔具及環境改善",
+        code: "EF碼",
+        desc: "三年補助額度 $40,000 元。本部於113年起全面實施代償墊付，民眾僅需支付自部分負擔，即可取得輔具或進行工程改善。",
+        items: []
+      },
+      {
+        id: "wallet4",
+        title: "第四包：喘息服務額度",
+        code: "GA/SC碼",
+        desc: "提供居家、機構、社區三種喘息模式。年度總額約 $32,340 - $48,510 元(依等級)。",
+        items: [
+          { code: 'GA09', name: '居家喘息(2hr)', price: 770 },
+          { code: 'SC09', name: '短照服務(2hr)', price: 770 },
+        ]
+      }
     ];
 
+    const allServiceItems = serviceCategories.flatMap(c => c.items);
+
     // --- SVG 圖示組件 ---
-    const Sun = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>;
+    const Sun = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>;
+    const Phone = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>;
+    const MessageCircle = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>;
+    const Calculator = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="12" y1="10" x2="12" y2="18"/></svg>;
+    const ChevronRight = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>;
     const Menu = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>;
     const X = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>;
-    const Phone = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>;
-    const MapPin = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>;
-    const Calculator = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>;
-    const MessageCircle = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>;
+    const MapPin = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>;
+    const CheckCircle = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>;
+    const Briefcase = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
 
-    // --- 子頁面組件 (定義於外部防止重新渲染時失去焦點) ---
+    // --- 子頁面組件 ---
+
     const HomePage = ({ onNavigate }) => (
-      <div className="animate-in fade-in duration-700">
-        <section className="relative h-[85vh] flex items-center px-4 overflow-hidden bg-gray-900">
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10"></div>
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80')] bg-cover bg-center"></div>
-          <div className="max-w-7xl mx-auto w-full relative z-20 pt-10">
-            <div className="max-w-3xl text-left">
-              <span className="bg-orange-500/20 text-orange-400 border border-orange-500/30 backdrop-blur-sm px-4 py-1 rounded-full text-[10px] font-black tracking-widest uppercase mb-6 inline-block">彰化大城專業居家照護</span>
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white mb-8 leading-tight">{fullBrandName}</h1>
-              <p className="text-stone-300 text-base md:text-lg mb-10 leading-relaxed max-w-xl">
-                由國家社工師領軍，提供彰化大城地區最有溫度的居家照護。我們讓照顧不再是家庭的重擔，而是愛的延續。
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <button onClick={() => onNavigate('calc')} className="bg-orange-500 text-white px-8 py-3.5 rounded-full font-black text-sm shadow-2xl flex items-center gap-2">
-                  <Calculator size={18}/> 費用試算系統
-                </button>
-                <a href="tel:0901071711" className="bg-white text-gray-900 px-8 py-3.5 rounded-full font-black text-sm flex items-center gap-2">
-                  <Phone size={18}/> 聯繫督導員
-                </a>
+      <div className="animate-page">
+        <section className="relative min-h-[90vh] flex items-center px-6 overflow-hidden hero-gradient py-20">
+          <div className="absolute top-10 right-10 text-orange-200/40 animate-sun">
+             <Sun size={400} />
+          </div>
+          
+          <div className="max-w-7xl mx-auto w-full relative z-20 px-4 md:px-10">
+            <div className="grid md:grid-cols-5 gap-16 items-center">
+              <div className="md:col-span-3 bg-white/70 p-8 md:p-12 q-rounded backdrop-blur-2xl border-4 border-white shadow-2xl">
+                <span className="bg-orange-500 text-white px-5 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase mb-8 inline-block shadow-lg">The Warm Care Journey</span>
+                
+                <h1 className="text-4xl md:text-6xl font-black text-gray-800 mb-8 leading-tight tracking-tighter whitespace-nowrap">
+                   關於暖暖
+                </h1>
+                
+                <div className="space-y-6 text-gray-600 text-lg leading-relaxed font-bold">
+                  <p>
+                    在彰化大城的海風中，「暖暖居家」因一個初心而生：讓偏鄉長輩在最熟悉的老屋裡，享有如家人般的溫潤照護。
+                  </p>
+                  <p>
+                    我們由專業社工師團隊親自督導。走訪過無數家庭後，我們決定化作一道永不落下的陽光，照進每一個需要陪伴的角落。
+                  </p>
+                  <p className="text-orange-600 font-black">
+                    因為我們深信：最好的照護不只是專業的醫護，更是一份帶著溫度的生命守候。
+                  </p>
+                </div>
+                
+                <div className="flex flex-wrap gap-4 mt-12">
+                  <button onClick={() => onNavigate('calc')} className="bg-orange-500 text-white px-10 py-5 rounded-full font-black text-sm shadow-xl hover:scale-105 transition active:scale-95 flex items-center gap-3">
+                    <Calculator size={20}/> 費用補助試算
+                  </button>
+                  <button onClick={() => onNavigate('info')} className="bg-white text-orange-600 border-4 border-orange-100 px-10 py-5 rounded-full font-black text-sm flex items-center gap-3 hover:bg-orange-50 transition shadow-xl active:scale-95">
+                    了解服務與對象
+                  </button>
+                </div>
+              </div>
+              
+              <div className="hidden md:flex md:col-span-2 flex-col items-center justify-center text-center animate-page delay-300">
+                 <div className="w-64 h-64 bg-white rounded-[80px] shadow-inner flex items-center justify-center border-[12px] border-orange-50 animate-sun">
+                    <Sun size={120} className="text-orange-500" />
+                 </div>
+                 <div className="mt-10 space-y-3">
+                    <p className="text-orange-500 font-black text-2xl tracking-widest">守護大城．讓愛無礙</p>
+                    <p className="text-stone-400 font-bold text-xs uppercase tracking-widest font-black">暖暖太陽形象</p>
+                 </div>
               </div>
             </div>
           </div>
@@ -124,121 +234,300 @@
       </div>
     );
 
-    const CalcPage = ({ level, setLevel, identity, setIdentity, quantities, handleQtyChange, calcResults }) => (
-      <div className="pt-24 pb-24 px-4 bg-stone-100 min-h-screen">
+    const InfoPage = ({ onNavigate }) => (
+      <div className="pt-32 pb-24 px-6 bg-stone-50 min-h-screen animate-page">
         <div className="max-w-5xl mx-auto">
-          <div className="bg-white p-6 md:p-10 rounded-[32px] shadow-sm mb-6 text-center border border-stone-200 overflow-hidden relative">
-              <h2 className="text-2xl md:text-3xl font-black text-gray-800 tracking-tight">長照 3.0 費用試算系統</h2>
-              <p className="text-stone-400 text-xs mt-2 italic font-bold">由專業社工師親自校對，協助家屬精準預估</p>
-              <Sun className="absolute -top-10 -right-10 text-orange-50/50" size={150} />
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-black text-gray-800 mb-4 tracking-tight">長照服務與申請資格</h2>
+            <p className="text-stone-500 text-sm max-w-2xl mx-auto font-bold italic underline decoration-orange-300 decoration-4 underline-offset-8 font-black">依據 1966 最新規範整理</p>
           </div>
 
-          <div className="bg-white p-6 md:p-8 rounded-[32px] shadow-sm mb-8 border border-stone-200">
-            <div className="grid md:grid-cols-2 gap-10">
-              <div>
-                <label className="text-[10px] font-black text-orange-500 uppercase tracking-widest block mb-4 italic">1. 選擇失能等級 (CMS)</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {Object.keys(levelData).map(l => (
-                    <button key={l} onClick={() => setLevel(l)} className={`py-3 rounded-xl font-black text-sm transition-all ${level === l ? 'bg-orange-500 text-white shadow-lg' : 'bg-stone-100 text-stone-500'}`}>{l}級</button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="text-[10px] font-black text-orange-500 uppercase tracking-widest block mb-4 italic">2. 您的福利身份</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {['16', '5', '0'].map(id => (
-                    <button key={id} onClick={() => setIdentity(id)} className={`py-3 rounded-xl font-black text-[11px] transition-all border-2 ${identity === id ? 'border-orange-500 bg-orange-50 text-orange-700' : 'border-transparent bg-stone-100 text-stone-400'}`}>
-                      {id === '16' ? '一般戶' : id === '5' ? '中低收' : '低收入'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+          {/* 申請資格對象 */}
+          <div className="q-card p-10 md:p-12 mb-16 relative overflow-hidden bg-gray-900 text-white border-none shadow-orange-900/30">
+             <div className="absolute top-0 right-0 p-8 opacity-10"><Sun size={150}/></div>
+             <h3 className="text-2xl font-black mb-8 flex items-center gap-3 relative z-10 text-orange-400 font-black">服務申請對象資格</h3>
+             <p className="font-bold text-orange-100 mb-8 border-l-4 border-orange-500 pl-4 py-1 text-lg">
+                經評估長照需要等級(CMS)第 2 級以上，且符合下列之一者：
+             </p>
+             <div className="grid md:grid-cols-2 gap-4 relative z-10 font-bold text-sm">
+                {[
+                  "65 歲以上失能老人", 
+                  "55 歲以上失能原住民", 
+                  "50 歲以上失智症者 (自115/1/1起新增49歲以下)", 
+                  "領有證明之失能身心障礙者",
+                  "115/1/1起新增：急性後期整合照護計畫(PAC)收案對象"
+                ].map((t, i) => (
+                  <div key={i} className="bg-white/5 p-4 rounded-3xl flex items-center gap-4 border border-white/10">
+                    <CheckCircle size={20} className="text-orange-500 shrink-0"/>
+                    <span className="font-black">{t}</span>
+                  </div>
+                ))}
+             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div className="bg-white p-6 rounded-[24px] border border-orange-100 shadow-sm flex flex-col justify-between">
-              <p className="text-[10px] font-black text-stone-400 mb-1 uppercase tracking-widest">每月給付額度</p>
-              <p className="text-2xl font-black text-gray-800">${levelData[level].subsidy.toLocaleString()}</p>
-              <div className="mt-2 h-1 bg-stone-100 rounded-full overflow-hidden"><div className="h-full bg-orange-500 w-full"></div></div>
-            </div>
-            <div className="bg-white p-6 rounded-[24px] border border-orange-100 shadow-sm flex flex-col justify-between">
-              <p className="text-[10px] font-black text-stone-400 mb-1 uppercase tracking-widest">喘息服務額度 (GA)</p>
-              <p className="text-2xl font-black text-orange-600">${levelData[level].respite.toLocaleString()}<span className="text-xs ml-1 font-bold text-stone-400">/年</span></p>
-              <p className="text-[9px] text-stone-400 mt-2">適用於居家/機構/夜間喘息</p>
-            </div>
-            <div className="bg-white p-6 rounded-[24px] border border-orange-100 shadow-sm flex flex-col justify-between">
-              <p className="text-[10px] font-black text-stone-400 mb-1 uppercase tracking-widest">短照服務額度</p>
-              <p className="text-2xl font-black text-orange-600">${levelData[level].short.toLocaleString()}<span className="text-xs ml-1 font-bold text-stone-400">/年</span></p>
-              <p className="text-[9px] text-stone-400 mt-2">緩解家屬壓力之短期照護</p>
-            </div>
-          </div>
-
-          <div className="grid lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-4">
-              <div className="bg-white rounded-[32px] shadow-sm border border-stone-200 overflow-hidden">
-                <div className="bg-stone-50 px-6 py-4 border-b border-stone-100 flex justify-between items-center">
-                  <h3 className="font-black text-gray-700 text-sm">居家服務細項選擇</h3>
-                  <span className="text-[10px] font-bold text-stone-400">輸入每月預計使用次數</span>
-                </div>
-                <div className="divide-y divide-stone-50 max-h-[1000px] overflow-y-auto pr-1 custom-scrollbar">
-                  {serviceItems.map(item => {
-                    const price = item.price;
-                    const coPay = identity === '0' ? 0 : Math.round(price * (parseInt(identity) / 100));
-                    return (
-                      <div key={item.code} className={`p-4 md:p-6 flex items-center justify-between hover:bg-stone-50 transition-colors ${quantities[item.code] > 0 ? 'bg-orange-50/30' : ''}`}>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="bg-white border border-stone-200 text-stone-400 text-[9px] font-black px-1.5 py-0.5 rounded">{item.code}</span>
-                            <span className="text-sm font-black text-gray-800">{item.name}</span>
+          <div className="space-y-16">
+            
+            {/* 第一包 */}
+            <div className="q-card overflow-hidden">
+               <div className="bg-orange-500 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-4">
+                  <div>
+                    <span className="bg-white/20 text-[10px] font-black px-2 py-1 rounded mb-2 inline-block uppercase tracking-widest font-black">錢包 01</span>
+                    <h4 className="text-2xl font-black tracking-tight">照顧及專業服務</h4>
+                  </div>
+                  <span className="text-white/40 font-black italic text-lg font-black uppercase">BA/CB/BD03碼</span>
+               </div>
+               <div className="p-8 md:p-12">
+                  <p className="text-stone-600 leading-relaxed font-bold mb-10 text-lg border-b border-orange-50 pb-8 font-black">本組合每月給付額度依長照等級為 $10,020 至 $36,180 不等。</p>
+                  <div className="space-y-6">
+                    <h5 className="font-black text-orange-600 underline underline-offset-4">★ 社區式服務交通接送 (BD03)</h5>
+                    <p className="text-sm text-stone-500 leading-relaxed font-black">
+                      接送對象居家至日照中心、托顧家庭、失智據點、輔具中心等。10公里內給付價格：一般區 115 元；離島及原民區 140 元。
+                    </p>
+                    <h5 className="font-black text-orange-600 underline underline-offset-4">★ 居家照顧項目 (BA碼)</h5>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {serviceCategories[0].items.map(item => (
+                          <div key={item.code} className="bg-stone-50 p-3 rounded-2xl border border-stone-100 flex items-center gap-3">
+                             <div className="w-1.5 h-1.5 bg-orange-500 rounded-full shrink-0"></div>
+                             <span className="text-[10px] font-black text-stone-300 uppercase shrink-0 font-black">{item.code}</span>
+                             <span className="text-xs font-black text-stone-600 font-black">{item.name}</span>
                           </div>
-                          <div className="text-[10px] text-stone-400 font-medium">定價 ${price} | 自付 <span className="text-orange-600 font-bold">${coPay}</span></div>
-                        </div>
-                        <div className="flex items-center gap-1.5 bg-white border border-stone-200 rounded-xl p-1 shadow-sm">
-                          <button onClick={() => handleQtyChange(item.code, (quantities[item.code] || 0) - 1)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-stone-100 text-stone-500 font-black hover:bg-stone-200">-</button>
-                          <input 
-                            type="number" 
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            onFocus={(e) => e.target.select()}
-                            className="w-10 text-center text-xs font-black text-orange-600 outline-none bg-transparent"
-                            value={quantities[item.code] || 0}
-                            onChange={(e) => handleQtyChange(item.code, e.target.value)}
-                          />
-                          <button onClick={() => handleQtyChange(item.code, (quantities[item.code] || 0) + 1)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-orange-500 text-white font-black hover:bg-orange-600">+</button>
-                        </div>
-                      </div>
-                    );
-                  })}
+                        ))}
+                    </div>
+                  </div>
+               </div>
+            </div>
+
+            {/* 第二包 */}
+            <div className="q-card overflow-hidden">
+               <div className="bg-stone-800 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-4">
+                  <div>
+                    <span className="bg-white/20 text-[10px] font-black px-2 py-1 rounded mb-2 inline-block uppercase tracking-widest font-black">錢包 02</span>
+                    <h4 className="text-2xl font-black tracking-tight font-black">交通接送服務 (DA01)</h4>
+                  </div>
+                  <span className="text-white/20 font-black italic text-lg font-black uppercase">DA碼</span>
+               </div>
+               <div className="p-8 md:p-12">
+                  <p className="text-stone-600 leading-relaxed font-bold mb-6 text-lg font-black">往返居家至醫療院所就醫、定期式復健或透析治療之交通接送。</p>
+                  <div className="bg-stone-50 p-6 rounded-3xl border-2 border-stone-100">
+                    <p className="text-stone-500 font-black text-sm">每月給付額度依轄區面積分為四類，為 **$1,680 至 $2,400** 不等。每趟給付價格由地方主管機關訂定公告。</p>
+                  </div>
+               </div>
+            </div>
+
+            {/* 第三包 */}
+            <div className="q-card overflow-hidden">
+               <div className="bg-orange-600 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-4">
+                  <div>
+                    <span className="bg-white/20 text-[10px] font-black px-2 py-1 rounded mb-2 inline-block uppercase tracking-widest font-black">錢包 03</span>
+                    <h4 className="text-2xl font-black tracking-tight font-black">輔具及居家無障礙環境改善</h4>
+                  </div>
+                  <span className="text-white/30 font-black italic text-lg font-black uppercase">EF碼</span>
+               </div>
+               <div className="p-8 md:p-12 space-y-8">
+                  <div className="bg-orange-50 p-6 rounded-3xl border-2 border-orange-100">
+                    <h5 className="font-black text-orange-600 mb-2">● 服務機制：代償墊付</h5>
+                    <p className="text-sm text-stone-600 font-black leading-relaxed">
+                      本部於 113 年起實施「代償墊付」，民眾前往特約單位購置或租賃輔具，僅需支付部分負擔。補助費用由特約單位向政府請款，減輕民眾一次性經濟負擔。
+                    </p>
+                  </div>
+                  <div className="space-y-4">
+                    <h5 className="font-black text-gray-800">● 輔具租賃服務 (15項)</h5>
+                    <p className="text-xs text-stone-400 font-black">滿足病情變化快或臨時性需求，項目包含：</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-[11px] font-black text-stone-500">
+                      <span>• 輪椅 (B款/附加功能A.B.C款)</span>
+                      <span>• 電動輪椅 / 電動代步車</span>
+                      <span>• 氣墊床 (A.B款)</span>
+                      <span>• 居家用照顧床 (含附加功能)</span>
+                      <span>• 爬梯機 / 移位機 / 帶輪助步車</span>
+                    </div>
+                  </div>
+               </div>
+            </div>
+
+            {/* 第四包 */}
+            <div className="q-card overflow-hidden">
+               <div className="bg-[#FFF4ED] p-8 text-orange-600 border-b-4 border-orange-100">
+                  <span className="bg-orange-500 text-white text-[10px] font-black px-2 py-1 rounded mb-2 inline-block uppercase tracking-widest font-black">錢包 04</span>
+                  <h4 className="text-2xl font-black tracking-tight font-black">喘息服務</h4>
+               </div>
+               <div className="p-8 md:p-12 space-y-8">
+                  <div className="grid md:grid-cols-3 gap-6 font-black">
+                    <div className="p-4 bg-white border-2 border-orange-50 rounded-2xl">
+                      <p className="text-orange-500 text-sm mb-2 uppercase">居家喘息</p>
+                      <p className="text-xs text-stone-400 leading-relaxed">由照服員至家中提供身體照顧、服藥、翻身拍背等服務。</p>
+                    </div>
+                    <div className="p-4 bg-white border-2 border-orange-50 rounded-2xl">
+                      <p className="text-orange-500 text-sm mb-2 uppercase">機構喘息</p>
+                      <p className="text-xs text-stone-400 leading-relaxed">入住住宿式機構接受24小時照顧，含護理、活動安排。</p>
+                    </div>
+                    <div className="p-4 bg-white border-2 border-orange-50 rounded-2xl">
+                      <p className="text-orange-500 text-sm mb-2 uppercase">社區喘息</p>
+                      <p className="text-xs text-stone-400 leading-relaxed">至日照中心、巷弄長照站或小多中心接受日間或夜間照顧。</p>
+                    </div>
+                  </div>
+
+                  <div className="table-container shadow-sm border border-orange-100">
+                    <table>
+                      <thead>
+                        <tr><th>代碼</th><th>照顧組合</th><th>支付價格</th></tr>
+                      </thead>
+                      <tbody className="font-black text-stone-600">
+                        <tr><td>GA03</td><td>日照中心(全日)</td><td>1,250元 / 全日</td></tr>
+                        <tr><td>GA05</td><td>機構住宿式</td><td>2,310元 / 24小時</td></tr>
+                        <tr><td>GA06</td><td>小多夜間喘息</td><td>2,000元 / 18:00-08:00</td></tr>
+                        <tr><td>GA09</td><td>居家喘息</td><td>770元 / 2小時</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+               </div>
+            </div>
+
+          </div>
+
+          {/* 5 步驟流程 */}
+          <div className="mt-24 text-center">
+             <h3 className="text-3xl font-black text-gray-800 mb-16 underline decoration-orange-500/20 decoration-8 underline-offset-[-4px] font-black">服務申請 5 大標準流程</h3>
+             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 px-4">
+                {[
+                  { s: "1", t: "來電洽詢" }, { s: "2", t: "協助評估" }, 
+                  { s: "3", t: "到家訪問" }, { s: "4", t: "簽訂契約" }, { s: "5", t: "定期訪視" }
+                ].map((s, idx) => (
+                  <div key={idx} className="flex flex-col items-center relative group">
+                    <div className="w-20 h-20 bg-white border-4 border-orange-100 rounded-[35px] flex items-center justify-center font-black text-3xl mb-6 shadow-sm group-hover:scale-110 group-hover:bg-orange-500 group-hover:text-white group-hover:border-orange-500 transition-all duration-300">
+                      {s.s}
+                    </div>
+                    <h4 className="font-black text-gray-800 text-lg font-black">{s.t}</h4>
+                    {idx < 4 && <div className="hidden md:block absolute top-10 -right-4 text-orange-200"><ChevronRight size={24}/></div>}
+                  </div>
+                ))}
+             </div>
+          </div>
+        </div>
+      </div>
+    );
+
+    const RecruitPage = () => (
+      <div className="pt-28 pb-24 px-6 bg-white min-h-screen animate-page text-center">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="mb-16 animate-card">
+             <div className="bg-orange-500 w-24 h-24 rounded-[40px] flex items-center justify-center text-white mx-auto mb-8 shadow-xl animate-sun">
+                <Briefcase size={48}/>
+             </div>
+             <h2 className="text-4xl font-black text-gray-800 mb-4 tracking-tighter uppercase font-black">人才招募專區</h2>
+             <p className="text-stone-500 text-sm font-bold italic underline decoration-orange-200 decoration-8 underline-offset-[-2px] font-black">與我們共同分享營運成果，傳遞照護溫度</p>
+          </div>
+
+          <div className="q-card p-10 md:p-16 border-stone-100">
+            <h3 className="text-2xl md:text-3xl font-black text-gray-800 mb-10 pb-6 border-b-2 border-stone-50 flex items-center justify-center gap-4 font-black">
+               居家照顧服務員 
+               <span className="text-xs bg-orange-500 text-white px-4 py-1.5 rounded-full animate-bounce">招募中</span>
+            </h3>
+            
+            <div className="space-y-12">
+               <div className="bg-orange-50 p-8 md:p-12 rounded-[50px] shadow-inner border-2 border-dashed border-orange-200">
+                  <h4 className="text-xl font-black text-orange-600 mb-6 underline decoration-orange-200 underline-offset-8 text-center font-black uppercase">薪資待遇與同仁福利</h4>
+                  <p className="text-gray-700 leading-loose text-lg md:text-xl font-black italic font-black">
+                    「提供完善的薪資及福利制度，包含績效獎金與員工酬勞…等，與同仁共同分享營運上的成果，也獎勵同仁在公司的辛勞及貢獻。」
+                  </p>
+               </div>
+
+               <div className="text-center pt-10">
+                  <a href={lineUrl} target="_blank" className="inline-flex items-center gap-4 bg-green-500 text-white px-14 py-6 rounded-full font-black text-xl shadow-2xl hover:scale-105 transition active:scale-95 font-black uppercase">
+                     <MessageCircle size={32}/> LINE 應徵洽詢
+                  </a>
+               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
+    const CalcPage = ({ level, setLevel, identity, setIdentity, quantities, handleQtyChange, calcResults }) => (
+      <div className="pt-28 pb-24 px-6 bg-stone-100 min-h-screen animate-page">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="bg-white p-12 q-rounded q-card mb-12 text-center border-none relative overflow-hidden animate-card">
+              <h2 className="text-3xl font-black text-gray-800 uppercase tracking-tighter font-black">長照 3.0 費用試算</h2>
+              <Sun className="absolute -top-16 -right-16 text-orange-500 opacity-5 w-64 h-64 animate-sun" />
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-10">
+            <div className="lg:col-span-2 space-y-8 px-4 md:px-0">
+              <div className="bg-white p-10 q-rounded shadow-sm border border-stone-100 animate-card">
+                <div className="grid md:grid-cols-2 gap-12 text-left">
+                  <div>
+                    <label className="text-xs font-black text-orange-500 block mb-6 italic uppercase tracking-widest font-black">1. 選擇失能等級</label>
+                    <div className="grid grid-cols-4 gap-3">
+                      {Object.keys(levelData).map(l => (
+                        <button key={l} onClick={() => setLevel(l)} className={`py-4 rounded-[25px] font-black text-base transition-all ${level === l ? 'bg-orange-500 text-white shadow-lg scale-110' : 'bg-stone-50 text-stone-400 hover:bg-orange-100'}`}>{l}級</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-black text-orange-500 block mb-6 italic uppercase tracking-widest font-black">2. 您的福利身份</label>
+                    <div className="grid grid-cols-3 gap-3">
+                      {['16', '5', '0'].map(id => (
+                        <button key={id} onClick={() => setIdentity(id)} className={`py-4 rounded-[25px] font-black text-xs border-2 transition-all ${identity === id ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md font-black' : 'border-transparent bg-stone-50 text-stone-400 hover:bg-orange-100'}`}>
+                          {id === '16' ? '一般戶' : id === '5' ? '中低收' : '低收入'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
+              </div>
+
+              <div className="space-y-6">
+                 {serviceCategories.map((cat, cIdx) => (
+                    cat.items.length > 0 && (
+                      <div key={cIdx} className={`bg-white q-rounded border border-stone-100 overflow-hidden shadow-sm animate-card delay-${(cIdx+1)*100}`}>
+                         <div className="bg-stone-50 px-10 py-5 border-b border-stone-100 text-left font-black">
+                            <h3 className="font-black text-gray-800 text-lg">{cat.title}</h3>
+                         </div>
+                         <div className="divide-y divide-stone-50">
+                            {cat.items.map(item => {
+                               const coPay = identity === '0' ? 0 : Math.round(item.price * (parseInt(identity) / 100));
+                               const q = quantities[item.code] || 0;
+                               return (
+                                  <div key={item.code} className={`p-6 flex items-center justify-between transition-all ${q > 0 ? 'bg-orange-50/60' : 'hover:bg-orange-50/10'}`}>
+                                     <div className="flex-1 pr-4 text-left">
+                                        <div className="flex items-center gap-3 mb-1">
+                                           <span className="text-[10px] font-black text-orange-400 uppercase tracking-widest font-black">{item.code}</span>
+                                           <span className="text-lg font-black text-gray-800 font-black">{item.name}</span>
+                                        </div>
+                                        <div className="text-xs text-stone-400 font-black font-black">定價 ${item.price} | 自付額 <span className="text-orange-600 font-black">${coPay}</span></div>
+                                     </div>
+                                     <div className="flex items-center gap-3 bg-white border border-stone-200 rounded-[25px] p-1.5 shadow-sm">
+                                        <button onClick={() => handleQtyChange(item.code, q - 1)} className="w-10 h-10 flex items-center justify-center rounded-full bg-stone-50 text-stone-400 font-black">-</button>
+                                        <input type="number" inputMode="numeric" pattern="[0-9]*" onFocus={(e) => e.target.select()} className="w-10 text-center text-base font-black text-orange-600 outline-none bg-transparent" value={q} onChange={(e) => handleQtyChange(item.code, e.target.value)} />
+                                        <button onClick={() => handleQtyChange(item.code, q + 1)} className="w-10 h-10 flex items-center justify-center rounded-full bg-orange-500 text-white font-black shadow-md transition-all active:scale-90">+</button>
+                                     </div>
+                                  </div>
+                               );
+                            })}
+                         </div>
+                      </div>
+                    )
+                 ))}
               </div>
             </div>
 
-            <div className="lg:col-span-1">
-              <div className="sticky top-24 space-y-6">
-                <div className="bg-gray-900 rounded-[40px] p-8 text-white shadow-xl relative overflow-hidden">
-                  <p className="text-[10px] font-bold text-orange-400 mb-2 uppercase tracking-widest flex justify-between">預估每月自付總額 <span className="text-white/30 tracking-normal">CMS 第 {level} 級</span></p>
-                  <h3 className="text-5xl font-black mb-8 tracking-tighter">${calcResults.totalCopay.toLocaleString()}</h3>
-                  <div className="space-y-4 border-t border-white/10 pt-6">
-                    <div className="flex justify-between text-[11px] font-bold">
-                      <span className="text-white/40 uppercase tracking-widest">已使用額度額</span>
-                      <span className={`${calcResults.currentTotalCost > calcResults.subsidyLimit ? 'text-red-400' : 'text-stone-300'}`}>
+            <div className="lg:col-span-1 px-4 md:px-0 text-left">
+              <div className="sticky top-32 space-y-8 animate-card delay-300">
+                <div className="bg-gray-900 rounded-[50px] p-10 text-white shadow-2xl relative overflow-hidden">
+                  <p className="text-sm font-black text-orange-400 mb-3 uppercase flex justify-between tracking-widest font-black">預估每月自付總額 <span className="text-white/30 font-bold">第 {level} 級</span></p>
+                  <h3 className="text-5xl md:text-6xl font-black mb-10 tracking-tighter animate-pulse font-black">${calcResults.totalCopay.toLocaleString()}</h3>
+                  <div className="space-y-4 border-t border-white/10 pt-8 font-black text-xs">
+                    <div className="flex justify-between font-black">
+                      <span className="text-white/40 uppercase">已用額度 / 補助上限</span>
+                      <span className={`${calcResults.currentTotalCost > calcResults.subsidyLimit ? 'text-red-400' : 'text-orange-100'}`}>
                         ${calcResults.currentTotalCost.toLocaleString()} / ${calcResults.subsidyLimit.toLocaleString()}
                       </span>
                     </div>
-                    {calcResults.currentTotalCost > calcResults.subsidyLimit && (
-                      <div className="bg-red-500/20 text-red-300 p-4 rounded-xl text-[10px] leading-relaxed border border-red-500/30 font-bold">
-                        ⚠ 您選擇的項目已超出等級上限，超額部分以全自費計算。
-                      </div>
-                    )}
                   </div>
+                  <Sun className="absolute -bottom-10 -right-10 text-white/5 w-48 h-48 animate-sun" />
                 </div>
-                <div className="bg-white p-8 rounded-[32px] border border-stone-200 text-center shadow-sm">
-                   <p className="text-[10px] font-bold text-stone-400 mb-6 leading-relaxed italic">※ 正確給付額度與服務項目，請以督導員開立之最終照顧計畫為準。</p>
-                   <div className="space-y-3">
-                     <a href="tel:0901071711" className="flex items-center justify-center gap-2 w-full bg-orange-500 text-white py-4 rounded-xl font-black text-sm shadow-md hover:bg-orange-600 transition"><Phone size={16}/> 電話諮詢督導</a>
-                     <a href={lineUrl} target="_blank" className="flex items-center justify-center gap-2 w-full border-2 border-green-500 text-green-600 py-3.5 rounded-xl font-black text-sm hover:bg-green-50 transition"><MessageCircle size={16}/> 加入 LINE 諮詢</a>
-                   </div>
+                <div className="bg-white p-10 q-rounded border-4 border-orange-50 text-center shadow-xl">
+                   <p className="text-[11px] font-black text-stone-400 mb-8 italic leading-relaxed font-black">※ 以上金額由社工師預估，最終依督導員開立之照顧計畫為準。</p>
+                   <a href="tel:0901071711" className="flex items-center justify-center gap-3 w-full bg-orange-500 text-white py-5 rounded-[25px] font-black text-lg shadow-xl hover:scale-105 transition-all font-black"><Phone size={22}/> 電話洽詢專員</a>
                 </div>
               </div>
             </div>
@@ -247,12 +536,10 @@
       </div>
     );
 
-    // --- 主組件 ---
-    const OfficialWebsite = () => {
+    const App = () => {
       const [currentPage, setCurrentPage] = useState('home');
       const [isMenuOpen, setIsMenuOpen] = useState(false);
       const [scrolled, setScrolled] = useState(false);
-
       const [level, setLevel] = useState('2');
       const [identity, setIdentity] = useState('16');
       const [quantities, setQuantities] = useState({});
@@ -269,17 +556,15 @@
         const rate = parseInt(identity) / 100;
         let currentTotalCost = 0;
         let totalCopay = 0;
-
         Object.keys(quantities).forEach(code => {
-          const item = serviceItems.find(i => i.code === code);
+          const item = allServiceItems.find(i => i.code === code);
           const qty = parseInt(quantities[code]) || 0;
           for (let i = 0; i < qty; i++) {
             if (currentTotalCost + item.price <= subsidyLimit) {
               totalCopay += Math.round(item.price * (identity === '0' ? 0 : rate));
             } else {
               const remainingSubsidy = Math.max(0, subsidyLimit - currentTotalCost);
-              const copayForRemaining = Math.round(remainingSubsidy * (identity === '0' ? 0 : rate));
-              totalCopay += (copayForRemaining + (item.price - remainingSubsidy));
+              totalCopay += (Math.round(remainingSubsidy * (identity === '0' ? 0 : rate)) + (item.price - remainingSubsidy));
             }
             currentTotalCost += item.price;
           }
@@ -299,79 +584,86 @@
       };
 
       return (
-        <div className="min-h-screen bg-stone-50">
-          <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 shadow-md py-2' : 'bg-transparent py-4'}`}>
-            <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
-              <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('home')}>
-                <div className="bg-orange-500 p-1.5 rounded-lg text-white shadow-md"><Sun size={20} /></div>
-                <div className="flex flex-col max-w-[220px] md:max-w-none text-left">
-                  <span className={`font-black text-[10px] md:text-sm tracking-tighter leading-tight ${scrolled ? 'text-gray-900' : 'text-white md:text-gray-900'}`}>{fullBrandName}</span>
-                  <span className={`text-[8px] font-bold ${scrolled ? 'text-orange-500' : 'text-white/80 md:text-orange-500'}`}>府授衛長字第1150109649號</span>
+        <div className="min-h-screen flex flex-col overflow-x-hidden">
+          <nav className={`fixed w-full z-[100] transition-all duration-500 ${scrolled ? 'glass-nav shadow-md py-3' : 'bg-transparent py-8'}`}>
+            <div className="max-w-[1500px] mx-auto px-8 flex justify-between items-center">
+              <div className="flex items-center gap-4 cursor-pointer group" onClick={() => navigate('home')}>
+                <div className="bg-orange-500 p-2.5 rounded-2xl text-white shadow-2xl animate-sun group-hover:rotate-12 transition duration-300"><Sun size={32} /></div>
+                <div className="flex flex-col text-left leading-tight">
+                  <span className="font-black text-sm md:text-base tracking-tighter text-gray-900 font-black">{fullBrandName}</span>
+                  <span className="text-[10px] font-black text-orange-500 tracking-widest font-black uppercase">府授衛長字第1150109649號</span>
                 </div>
               </div>
-              <div className={`hidden lg:flex gap-6 items-center font-bold text-xs ${scrolled ? 'text-gray-600' : 'text-white md:text-gray-600'}`}>
-                <button onClick={() => navigate('home')} className="hover:text-orange-500">首頁</button>
-                <button onClick={() => navigate('calc')} className="hover:text-orange-500">費用試算</button>
-                <a href="tel:0901071711" className="bg-orange-500 text-white px-4 py-2 rounded-full text-[10px] shadow-lg flex items-center gap-2"><Phone size={12}/> 聯繫督導</a>
+              <div className={`hidden lg:flex gap-14 items-center font-black text-sm uppercase tracking-widest font-black`}>
+                <button onClick={() => navigate('home')} className={`hover:text-orange-500 ${currentPage==='home'?'text-orange-500 underline underline-offset-[16px] decoration-4':''}`}>首頁故事</button>
+                <button onClick={() => navigate('info')} className={`hover:text-orange-500 ${currentPage==='info'?'text-orange-500 underline underline-offset-[16px] decoration-4':''}`}>服務與對象</button>
+                <button onClick={() => navigate('calc')} className={`hover:text-orange-500 ${currentPage==='calc'?'text-orange-500 underline underline-offset-[16px] decoration-4':''}`}>費用試算</button>
+                <button onClick={() => navigate('recruit')} className={`hover:text-orange-500 ${currentPage==='recruit'?'text-orange-500 underline underline-offset-[16px] decoration-4':''}`}>人才招募</button>
+                <a href="tel:0901071711" className="bg-orange-500 text-white px-8 py-3.5 rounded-full text-xs shadow-2xl hover:scale-105 transition active:scale-95 flex items-center gap-3 font-black"><Phone size={16}/> 聯繫督導</a>
               </div>
-              <button className={`lg:hidden ${scrolled ? 'text-gray-900' : 'text-white'}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
+              <button className="lg:hidden text-gray-800 p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}><Menu size={36} /></button>
             </div>
             {isMenuOpen && (
-              <div className="lg:hidden fixed inset-0 top-[60px] bg-white z-40 p-6 flex flex-col gap-6 text-lg font-black text-gray-800">
-                <button onClick={() => navigate('home')} className="text-left border-b pb-4">首頁</button>
-                <button onClick={() => navigate('calc')} className="text-left border-b pb-4">費用試算</button>
-                <a href={lineUrl} target="_blank" className="bg-green-500 text-white p-4 rounded-xl text-center">加入 LINE 諮詢</a>
+              <div className="lg:hidden fixed inset-0 top-0 bg-white z-[200] p-12 flex flex-col gap-8 text-2xl font-black text-gray-800 animate-page font-black">
+                <div className="flex justify-end mb-12"><button onClick={()=>setIsMenuOpen(false)}><X size={56} className="text-stone-300"/></button></div>
+                <button onClick={() => navigate('home')} className="text-left border-b-4 border-stone-50 pb-8 flex justify-between items-center">首頁故事 <ChevronRight size={28}/></button>
+                <button onClick={() => navigate('info')} className="text-left border-b-4 border-stone-50 pb-8 flex justify-between items-center">服務項目 <ChevronRight size={28}/></button>
+                <button onClick={() => navigate('calc')} className="text-left border-b-4 border-stone-50 pb-8 flex justify-between items-center">費用試算 <ChevronRight size={28}/></button>
+                <button onClick={() => navigate('recruit')} className="text-left border-b-4 border-stone-50 pb-8 flex justify-between items-center">人才招募 <ChevronRight size={28}/></button>
               </div>
             )}
           </nav>
 
-          {currentPage === 'home' ? (
-            <HomePage onNavigate={navigate} />
-          ) : (
-            <CalcPage 
-              level={level} setLevel={setLevel} 
-              identity={identity} setIdentity={setIdentity} 
-              quantities={quantities} handleQtyChange={handleQtyChange} 
-              calcResults={calcResults} 
-            />
-          )}
+          <main className="flex-grow">
+            {currentPage === 'home' && <HomePage onNavigate={navigate} />}
+            {currentPage === 'info' && <InfoPage onNavigate={navigate} />}
+            {currentPage === 'recruit' && <RecruitPage />}
+            {currentPage === 'calc' && <CalcPage level={level} setLevel={setLevel} identity={identity} setIdentity={setIdentity} quantities={quantities} handleQtyChange={handleQtyChange} calcResults={calcResults} />}
+          </main>
 
-          <footer className="bg-stone-900 text-white py-16 px-6 mt-auto">
-            <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 text-left">
+          <footer className="bg-stone-900 text-white py-24 px-10 mt-auto border-t-[12px] border-orange-500">
+            <div className="max-w-[1400px] mx-auto grid md:grid-cols-2 gap-24 text-left px-4">
               <div>
-                <div className="flex items-center gap-2 mb-6">
-                  <Sun className="text-orange-500" size={28} />
-                  <span className="text-sm font-black tracking-tighter leading-tight">{fullBrandName}</span>
+                <div className="flex items-center gap-5 mb-12">
+                  <div className="bg-orange-500 p-3 rounded-3xl animate-sun shadow-2xl"><Sun size={56} /></div>
+                  <span className="text-xl md:text-2xl font-black tracking-tighter leading-tight uppercase tracking-widest font-black">{fullBrandName}</span>
                 </div>
-                <p className="text-stone-500 text-xs leading-relaxed max-w-sm mb-6">秉持誠信與專業，深耕彰化大城。為在地長輩提供最有溫度的居家服務。</p>
-                <div className="inline-block bg-stone-800 text-stone-300 px-4 py-2 rounded-lg text-[10px] font-mono border border-stone-700">立案字號：府授衛長字第1150109649號</div>
-              </div>
-              <div className="space-y-4">
-                <h4 className="font-bold text-orange-500 text-sm">聯繫資訊</h4>
-                <div className="text-xs text-stone-400 space-y-3">
-                  <p className="flex items-center gap-3"><Phone size={14} className="text-orange-500"/> 0901-071-711</p>
-                  <p className="flex items-start gap-3"><MapPin size={14} className="text-orange-500 shrink-0 mt-0.5"/> 彰化縣大城鄉西勢路30號</p>
-                  <p className="flex items-center gap-3"><MessageCircle size={14} className="text-green-500"/> LINE ID: @957jphho</p>
+                <p className="text-stone-400 text-lg md:text-xl leading-relaxed max-w-xl mb-12 font-black italic font-black">
+                   在大城鄉的每一個朝陽升起之際，我們始終守候。我們連結社區資源，讓長輩享有高品質的居家生活。
+                </p>
+                <div className="inline-block bg-stone-800 text-stone-300 px-10 py-5 rounded-[35px] text-xs font-mono border border-stone-700 font-black tracking-widest font-black">
+                  立案字號：府授衛長字第1150109649號
                 </div>
               </div>
-            </div>
-            <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/5 text-[10px] text-stone-600 uppercase tracking-widest font-bold text-center md:text-left">
-              © 2026 Nuan Nuan Home Care. All Rights Reserved.
+              <div className="space-y-16">
+                <h4 className="font-black text-orange-500 text-base uppercase tracking-[0.4em] italic text-left underline decoration-orange-500/30 decoration-4 underline-offset-[12px] font-black">聯繫我們 / CONTACT US</h4>
+                <div className="text-lg md:text-xl text-stone-300 space-y-10 font-black">
+                  <div className="flex items-center gap-8 group cursor-pointer hover:text-orange-400 transition-all font-black">
+                    <div className="bg-stone-800 p-5 rounded-[30px] group-hover:bg-orange-500 group-hover:text-white transition-all shadow-xl shrink-0"><Phone size={32}/></div> 
+                    <span className="whitespace-nowrap font-black">0901-071-711</span>
+                  </div>
+                  <div className="flex items-center gap-8 group hover:text-orange-400 transition-all font-black">
+                    <div className="bg-stone-800 p-5 rounded-[30px] group-hover:bg-orange-500 group-hover:text-white transition-all shadow-xl shrink-0"><MapPin size={32} className="shrink-0"/></div> 
+                    <span className="whitespace-nowrap font-black leading-snug">彰化縣大城鄉西勢路30號</span>
+                  </div>
+                  <div className="flex items-center gap-8 group hover:text-green-400 transition-all font-black">
+                    <div className="bg-stone-800 p-5 rounded-[30px] group-hover:bg-green-500 group-hover:text-white transition-all shadow-xl shrink-0"><MessageCircle size={32}/></div> 
+                    <span className="whitespace-nowrap font-black">LINE ID: @957jphho</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </footer>
 
-          <div className="lg:hidden fixed bottom-4 right-4 z-50 flex flex-col gap-3">
-            <a href={lineUrl} target="_blank" className="bg-green-500 text-white w-12 h-12 rounded-full shadow-2xl flex items-center justify-center border-2 border-white"><MessageCircle size={20} /></a>
-            <a href="tel:0901071711" className="bg-orange-500 text-white w-12 h-12 rounded-full shadow-2xl flex items-center justify-center border-2 border-white"><Phone size={20} /></a>
+          <div className="lg:hidden fixed bottom-10 right-10 z-[150]">
+            <a href={lineUrl} target="_blank" className="bg-green-500 text-white w-20 h-20 rounded-full shadow-2xl flex items-center justify-center border-[6px] border-white animate-bounce transition-transform active:scale-90 shadow-2xl"><MessageCircle size={40} /></a>
           </div>
         </div>
       );
     };
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<OfficialWebsite />);
+    root.render(<App />);
   </script>
 </body>
 </html>
