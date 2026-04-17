@@ -4,14 +4,15 @@
   <base target="_top">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>暖暖居家長照機構 - 專業居家服務與試算</title>
   
-  <!-- 載入 Tailwind CSS (排版核心) -->
+  <!-- SEO 優化標籤 -->
+  <title>暖暖有限公司附設彰化縣私立暖暖居家長照機構 - 專業居家服務與試算</title>
+  <meta name="description" content="暖暖有限公司附設彰化縣私立暖暖居家長照機構提供彰化縣大城鄉專業居家服務，包含身體照顧、生活支援及喘息服務。立案字號：府授衛長字第1150109649號。">
+  
+  <!-- 載入核心庫 -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- 載入 React 核心庫 -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <!-- 載入 Babel 編譯器 -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <style>
@@ -19,9 +20,9 @@
     .custom-scrollbar::-webkit-scrollbar { width: 4px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #ED7D31; border-radius: 10px; }
-    /* 載入動畫 */
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
     .animate-pulse-fast { animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   </style>
 </head>
 <body class="bg-stone-50">
@@ -29,14 +30,14 @@
   <div id="root">
     <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh;">
       <div style="width: 50px; height: 50px; border-radius: 50%; background-color: #ED7D31; margin-bottom: 20px;" class="animate-pulse-fast"></div>
-      <h2 style="color: #ED7D31; font-weight: bold; font-size: 1.2rem;">暖暖居家載入中...</h2>
+      <h2 style="color: #ED7D31; font-weight: bold; font-size: 1rem;">暖暖居家載入中...</h2>
     </div>
   </div>
 
   <script type="text/babel">
     const { useState, useEffect } = React;
     
-    // 【極致穩定版】將所有圖示轉換為內建 SVG，完全擺脫外部套件卡住的風險！
+    // SVG 圖示
     const Sun = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>;
     const Menu = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>;
     const X = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>;
@@ -53,6 +54,7 @@
     const HelpCircle = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>;
     const ArrowDown = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>;
 
+    const fullBrandName = "暖暖有限公司附設彰化縣私立暖暖居家長照機構";
 
     const OfficialWebsite = () => {
       const [currentPage, setCurrentPage] = useState('home');
@@ -71,15 +73,14 @@
         return () => window.removeEventListener('scroll', handleScroll);
       }, []);
 
-      // --- 資料定義 ---
       const levelData = {
-        '2': { subsidy: 10020, co16: 1603, co5: 501, respite: '32,340', short: '87,780' },
-        '3': { subsidy: 15460, co16: 2474, co5: 773, respite: '32,340', short: '87,780' },
-        '4': { subsidy: 18580, co16: 2973, co5: 929, respite: '32,340', short: '87,780' },
-        '5': { subsidy: 24100, co16: 3856, co5: 1205, respite: '32,340', short: '87,780' },
-        '6': { subsidy: 28070, co16: 4491, co5: 1404, respite: '32,340', short: '87,780' },
-        '7': { subsidy: 32090, co16: 5134, co5: 1605, respite: '48,510', short: '71,610' },
-        '8': { subsidy: 36180, co16: 5789, co5: 1809, respite: '48,510', short: '71,610' },
+        '2': { subsidy: 10020, co16: 1603, co5: 501 },
+        '3': { subsidy: 15460, co16: 2474, co5: 773 },
+        '4': { subsidy: 18580, co16: 2973, co5: 929 },
+        '5': { subsidy: 24100, co16: 3856, co5: 1205 },
+        '6': { subsidy: 28070, co16: 4491, co5: 1404 },
+        '7': { subsidy: 32090, co16: 5134, co5: 1605 },
+        '8': { subsidy: 36180, co16: 5789, co5: 1809 },
       };
 
       const serviceItems = [
@@ -96,11 +97,10 @@
 
       const faqs = [
         { q: "要怎麼開始申請居家服務？", a: "您可以先撥打長照專線 1966，由照管中心評估失能等級後，指定由「暖暖居家」為您服務；或直接聯繫我們，我們將協助您完成後續流程。" },
-        { q: "居服員可以幫忙全家大掃除嗎？", a: "居家服務主要以「長輩本人的生活起居」為主（如：長輩的房間、長輩的衣物）。為了保障照服員的專業與您的權益，無法提供全家大掃除等非關長輩本人的勞務服務喔！" },
-        { q: "費用要怎麼計算？", a: "費用依據政府核定的失能等級（CMS）與您的福利身份（一般戶、中低收）而定。您可以使用我們網站上的「費用試算」工具，快速預估每月的自負額。" },
+        { q: "居服員可以幫忙全家大掃除嗎？", a: "居家服務主要以「長輩本人的生活起居」為主。為了保障專業品質，無法提供全家大掃除等勞務。" },
+        { q: "費用要怎麼計算？", a: "依據失能等級與身份而定，建議使用本站「費用試算」功能獲得預估金額。" },
       ];
 
-      // --- 邏輯函數 ---
       const navigate = (page) => {
         setCurrentPage(page);
         setIsMenuOpen(false);
@@ -122,14 +122,14 @@
 
         Object.keys(quantities).forEach(code => {
           const item = serviceItems.find(i => i.code === code);
-          const qty = quantities[code];
+          const qty = parseInt(quantities[code]) || 0;
           totalItems += qty;
           for (let i = 0; i < qty; i++) {
             if (currentTotalCost + item.price <= subsidyLimit) {
-              totalCopay += Math.round(item.price * rate);
+              totalCopay += Math.round(item.price * (identity === '0' ? 0 : rate));
             } else {
               const remainingSubsidy = Math.max(0, subsidyLimit - currentTotalCost);
-              const copayForRemaining = Math.round(remainingSubsidy * rate);
+              const copayForRemaining = Math.round(remainingSubsidy * (identity === '0' ? 0 : rate));
               totalCopay += (copayForRemaining + (item.price - remainingSubsidy));
             }
             currentTotalCost += item.price;
@@ -140,47 +140,51 @@
 
       const calcResults = getFullCalculation();
 
-      // --- 子組件 ---
+      const handleQtyChange = (code, val) => {
+        const newQty = Math.max(0, parseInt(val) || 0);
+        setQuantities({ ...quantities, [code]: newQty });
+      };
+
       const Navbar = () => (
         <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-md py-3' : 'bg-transparent py-6'}`}>
           <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
             <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('home')}>
-              <div className="bg-orange-500 p-2 rounded-xl text-white group-hover:rotate-12 transition-transform shadow-md">
+              <div className="bg-orange-500 p-2 rounded-xl text-white shadow-md">
                 <Sun size={24} />
               </div>
-              <div className="flex flex-col">
-                <span className={`font-black text-xl tracking-tighter ${scrolled ? 'text-gray-900' : 'text-white md:text-gray-900'}`}>暖暖居家</span>
+              <div className="flex flex-col max-w-[200px] md:max-w-none">
+                <span className={`font-black text-xs md:text-sm tracking-tighter leading-tight ${scrolled ? 'text-gray-900' : 'text-white md:text-gray-900'}`}>{fullBrandName}</span>
                 <span className={`text-[8px] font-bold ${scrolled ? 'text-orange-500' : 'text-white/80 md:text-orange-500'}`}>府授衛長字第1150109649號</span>
               </div>
             </div>
 
-            <div className={`hidden md:flex gap-8 items-center font-bold text-sm ${scrolled ? 'text-gray-600' : 'text-white md:text-gray-600'}`}>
+            <div className={`hidden lg:flex gap-8 items-center font-bold text-sm ${scrolled ? 'text-gray-600' : 'text-white md:text-gray-600'}`}>
               <button onClick={() => navigate('home')} className="hover:text-orange-500 transition">首頁</button>
               <button onClick={() => navigate('about')} className="hover:text-orange-500 transition">關於暖暖</button>
-              <button onClick={() => navigate('services')} className="hover:text-orange-500 transition">服務與常見問題</button>
+              <button onClick={() => navigate('services')} className="hover:text-orange-500 transition">服務流程</button>
               <button onClick={() => navigate('calc')} className="hover:text-orange-500 transition">費用試算</button>
-              <a href="tel:0901071711" className="bg-orange-500 text-white px-6 py-2.5 rounded-full hover:bg-orange-600 transition shadow-lg flex items-center gap-2">
-                <Phone size={16}/> 聯繫督導
+              <a href="tel:0901071711" className="bg-orange-500 text-white px-5 py-2 rounded-full hover:bg-orange-600 transition shadow-lg flex items-center gap-2">
+                <Phone size={14}/> 聯繫督導
               </a>
             </div>
 
-            <button className={`md:hidden ${scrolled ? 'text-gray-900' : 'text-white'}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <button className={`lg:hidden ${scrolled ? 'text-gray-900' : 'text-white'}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
           </div>
 
           {isMenuOpen && (
-            <div className="md:hidden fixed inset-0 top-[72px] bg-white z-40 p-6 flex flex-col gap-6 text-xl font-black text-gray-800 h-screen overflow-y-auto pb-32">
+            <div className="lg:hidden fixed inset-0 top-[72px] bg-white z-40 p-6 flex flex-col gap-6 text-xl font-black text-gray-800 h-screen overflow-y-auto pb-32">
               <button onClick={() => navigate('home')} className="text-left border-b pb-4 border-gray-100">首頁</button>
               <button onClick={() => navigate('about')} className="text-left border-b pb-4 border-gray-100">關於暖暖</button>
-              <button onClick={() => navigate('services')} className="text-left border-b pb-4 border-gray-100">服務與常見問題</button>
+              <button onClick={() => navigate('services')} className="text-left border-b pb-4 border-gray-100">服務流程</button>
               <button onClick={() => navigate('calc')} className="text-left border-b pb-4 border-gray-100">費用試算</button>
               <div className="mt-8 space-y-4">
                  <a href="tel:0901071711" className="flex items-center justify-center gap-2 bg-gray-900 text-white p-4 rounded-2xl text-center shadow-xl">
-                    <Phone size={20}/> 撥打電話聯繫
+                    <Phone size={20}/> 撥打電話
                  </a>
                  <a href="https://line.me/ti/p/~" className="flex items-center justify-center gap-2 bg-green-500 text-white p-4 rounded-2xl text-center shadow-xl">
-                    <MessageCircle size={20}/> 加入 LINE 官方帳號
+                    <MessageCircle size={20}/> 加入 LINE
                  </a>
               </div>
             </div>
@@ -194,7 +198,7 @@
             <div className="col-span-2">
               <div className="flex items-center gap-3 mb-6">
                 <Sun className="text-orange-500" size={32} />
-                <span className="text-2xl font-black">暖暖居家長照機構</span>
+                <span className="text-xl font-black">{fullBrandName}</span>
               </div>
               <p className="text-stone-400 text-sm leading-relaxed max-w-sm mb-6">
                 我們以專業、誠信、有溫度的服務，守護每一位長輩的居家生活。
@@ -204,215 +208,84 @@
               </div>
             </div>
             <div>
-              <h4 className="font-bold mb-6 text-orange-500">快速連結</h4>
+              <h4 className="font-bold mb-6 text-orange-500">快速導覽</h4>
               <ul className="space-y-4 text-stone-400 text-sm font-medium">
-                <li className="cursor-pointer hover:text-white transition" onClick={() => navigate('about')}>品牌理念與團隊</li>
-                <li className="cursor-pointer hover:text-white transition" onClick={() => navigate('services')}>服務申請流程</li>
-                <li className="cursor-pointer hover:text-white transition" onClick={() => navigate('calc')}>長照 3.0 試算器</li>
+                <li className="cursor-pointer hover:text-white" onClick={() => navigate('about')}>團隊理念</li>
+                <li className="cursor-pointer hover:text-white" onClick={() => navigate('services')}>申請流程</li>
+                <li className="cursor-pointer hover:text-white" onClick={() => navigate('calc')}>長照試算</li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-6 text-orange-500">聯繫我們</h4>
+              <h4 className="font-bold mb-6 text-orange-500">服務據點</h4>
               <ul className="space-y-4 text-stone-400 text-sm font-medium">
-                <li className="flex items-center gap-3"><Phone size={16} className="text-orange-500"/> 0901-071-711</li>
-                <li className="flex items-center gap-3"><MessageCircle size={16} className="text-green-500"/> Line: @nuannuan</li>
-                <li className="flex items-start gap-3"><MapPin size={16} className="text-orange-500 shrink-0 mt-1"/> 彰化市</li>
+                <li className="flex items-center gap-3"><Phone size={14} className="text-orange-500"/> 0901-071-711</li>
+                <li className="flex items-start gap-3"><MapPin size={14} className="text-orange-500 shrink-0 mt-1"/> 彰化縣大城鄉西勢路30號</li>
               </ul>
             </div>
           </div>
-          <div className="max-w-7xl mx-auto mt-20 pt-10 border-t border-white/5 text-[10px] text-stone-600 flex flex-col md:flex-row justify-between items-center gap-4 uppercase tracking-widest font-bold">
-            <span>© 2026 Nuan Nuan Home Care. All Rights Reserved.</span>
-            <span>Made with Heart in Changhua</span>
+          <div className="max-w-7xl mx-auto mt-20 pt-10 border-t border-white/5 text-[10px] text-stone-600 flex flex-col md:flex-row justify-between items-center gap-4 tracking-widest font-bold">
+            <span>© 2026 {fullBrandName}</span>
+            <span>MADE IN CHANGHUA</span>
           </div>
         </footer>
       );
 
-      // --- 各分頁內容 ---
       const HomePage = () => (
         <div className="animate-in fade-in duration-700">
           <section className="relative h-[90vh] flex items-center px-6 overflow-hidden bg-gray-900">
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10"></div>
             <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80')] bg-cover bg-center"></div>
-            <div className="max-w-7xl mx-auto w-full relative z-20">
-              <div className="max-w-2xl">
+            <div className="max-w-7xl mx-auto w-full relative z-20 pt-10">
+              <div className="max-w-3xl">
                 <span className="bg-orange-500/20 text-orange-400 border border-orange-500/30 backdrop-blur-sm px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase mb-6 inline-block">
-                  Professional Home Care
+                  彰化大城專業照護首選
                 </span>
-                <h1 className="text-5xl md:text-7xl font-black text-white mb-8 leading-[1.1]">暖暖照護，<br/><span className="text-orange-500">讓愛延續</span></h1>
-                <p className="text-stone-300 text-lg md:text-xl mb-12 font-medium leading-relaxed">
-                  將照顧的重擔交給專業。我們由國家考試合格社工師領軍，為您的家庭量身打造最合適、最有溫度的居家照護方案。
+                <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-8 leading-tight">{fullBrandName}</h1>
+                <p className="text-stone-300 text-lg md:text-xl mb-12 font-medium leading-relaxed max-w-2xl">
+                  守護在地長輩，減輕家庭負擔。由國家社工師親自帶領，為大城鄉親提供最暖心的居家照護服務。
                 </p>
                 <div className="flex flex-wrap gap-4">
-                  <button onClick={() => navigate('calc')} className="bg-orange-500 text-white px-8 py-4 rounded-full font-black text-sm hover:bg-orange-600 transition shadow-2xl shadow-orange-500/20 flex items-center gap-2">
-                    <Calculator size={18}/> 立即費用試算
+                  <button onClick={() => navigate('calc')} className="bg-orange-500 text-white px-8 py-4 rounded-full font-black text-sm hover:bg-orange-600 transition shadow-2xl flex items-center gap-2">
+                    <Calculator size={18}/> 費用試算系統
                   </button>
                   <a href="tel:0901071711" className="bg-white text-gray-900 px-8 py-4 rounded-full font-black text-sm hover:bg-gray-100 transition flex items-center gap-2">
-                    <Phone size={18}/> 免費諮詢督導
+                    <Phone size={18}/> 諮詢督導員
                   </a>
                 </div>
               </div>
             </div>
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 text-white/50 animate-bounce">
-               <ArrowDown size={24} />
-            </div>
           </section>
-
-          <section className="py-24 px-6 bg-white">
-            <div className="max-w-7xl mx-auto">
-               <div className="text-center mb-16">
-                  <h2 className="text-3xl font-black mb-4">為什麼選擇暖暖居家？</h2>
-                  <div className="w-16 h-1 bg-orange-500 mx-auto rounded-full"></div>
-               </div>
-               
-               <div className="grid md:grid-cols-3 gap-12">
-                 <div className="flex flex-col items-center text-center p-8 rounded-[32px] bg-stone-50 hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-stone-100">
-                   <div className="bg-orange-100 w-16 h-16 rounded-2xl flex items-center justify-center text-orange-600 mb-6"><Award size={28}/></div>
-                   <h3 className="text-xl font-black mb-3">專業社工督導</h3>
-                   <p className="text-stone-500 text-sm leading-relaxed">由具備國家考試合格證書的社工師親自帶領團隊，溝通無礙，更能精準評估長輩深層需求。</p>
-                 </div>
-                 <div className="flex flex-col items-center text-center p-8 rounded-[32px] bg-stone-50 hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-stone-100">
-                   <div className="bg-orange-100 w-16 h-16 rounded-2xl flex items-center justify-center text-orange-600 mb-6"><Heart size={28}/></div>
-                   <h3 className="text-xl font-black mb-3">嚴選照護團隊</h3>
-                   <p className="text-stone-500 text-sm leading-relaxed">每一位居服員皆具備長照人員小卡並受過完整訓練，提供有溫度、有尊嚴的貼身照顧。</p>
-                 </div>
-                 <div className="flex flex-col items-center text-center p-8 rounded-[32px] bg-stone-50 hover:bg-white hover:shadow-xl transition-all border border-transparent hover:border-stone-100">
-                   <div className="bg-orange-100 w-16 h-16 rounded-2xl flex items-center justify-center text-orange-600 mb-6"><ShieldCheck size={28}/></div>
-                   <h3 className="text-xl font-black mb-3">收費公開透明</h3>
-                   <p className="text-stone-500 text-sm leading-relaxed">嚴格落實政府長照計費標準，並提供線上即時試算系統，絕無隱藏費用，保障家屬權益。</p>
-                 </div>
-               </div>
-            </div>
-          </section>
-        </div>
-      );
-
-      const AboutPage = () => (
-        <div className="pt-32 pb-24 px-6 animate-in slide-in-from-bottom-10 duration-700 bg-white">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-20 items-center mb-20">
-              <div>
-                <span className="text-orange-500 font-black text-xs tracking-widest uppercase mb-4 block flex items-center gap-2">
-                  <div className="w-8 h-0.5 bg-orange-500"></div> 關於暖暖
-                </span>
-                <h2 className="text-4xl md:text-5xl font-black mb-8 leading-tight">以專業的底蘊，<br/>傳遞照顧的溫度</h2>
-                <div className="space-y-6 text-stone-600 leading-relaxed">
-                  <p>面對高齡化社會，我們深知每一位家屬在工作與長輩照護之間的兩難與疲憊。這也是「暖暖居家長照機構」成立的初衷——我們希望能成為您最堅強的後盾。</p>
-                  <p className="font-bold text-gray-900 border-l-4 border-orange-500 pl-4 py-1">
-                    暖暖居家由國家考試合格之專業社工師親自經營與督導。
-                  </p>
-                  <p>有別於傳統機構，我們將社工的「同理心」與「個案管理」專業帶入居家服務中。從首次到宅評估、擬定專屬照顧計畫，到後續的服務追蹤，我們都堅持以最高標準，確保長輩獲得最適切、最有尊嚴的對待。</p>
-                </div>
-              </div>
-              <div className="relative">
-                <div className="bg-stone-100 aspect-[4/5] rounded-[40px] overflow-hidden shadow-2xl relative z-10">
-                   <div className="w-full h-full bg-stone-200 flex items-center justify-center text-stone-400 font-bold bg-[url('https://images.unsplash.com/photo-1576765974102-b756026ecee3?auto=format&fit=crop&q=80')] bg-cover bg-center">
-                   </div>
-                </div>
-                <div className="absolute -bottom-8 -left-8 w-2/3 h-2/3 bg-orange-100 rounded-[40px] -z-0"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-
-      const ServicesPage = () => (
-        <div className="pt-32 pb-24 px-6 animate-in slide-in-from-bottom-10 duration-700 bg-stone-50 min-h-screen">
-          <div className="max-w-5xl mx-auto">
-            <div className="mb-24">
-               <h2 className="text-3xl font-black mb-12 text-center">服務申請 4 步驟</h2>
-               <div className="grid md:grid-cols-4 gap-6 relative">
-                  <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-orange-200 -translate-y-1/2 z-0"></div>
-                  {[
-                    { step: '1', title: '撥打 1966', desc: '向所在地長期照顧管理中心申請評估。' },
-                    { step: '2', title: '專員到府', desc: '照管專員到家中評估失能等級(CMS)。' },
-                    { step: '3', title: '指定暖暖', desc: '向專員指定「暖暖居家」為您服務。' },
-                    { step: '4', title: '簽約排班', desc: '督導到府討論計畫，安排居服員到宅。' }
-                  ].map((s, i) => (
-                    <div key={i} className="bg-white p-6 rounded-3xl shadow-sm border border-stone-100 relative z-10 text-center">
-                       <div className="w-12 h-12 bg-orange-500 text-white rounded-full flex items-center justify-center font-black text-xl mx-auto mb-4 border-4 border-white shadow-md">{s.step}</div>
-                       <h4 className="font-black mb-2 text-gray-800">{s.title}</h4>
-                       <p className="text-xs text-stone-500 leading-relaxed">{s.desc}</p>
-                    </div>
-                  ))}
-               </div>
-            </div>
-
-            <div className="mb-24">
-              <h2 className="text-3xl font-black mb-12 text-center">全方位居家照護項目</h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-white p-8 rounded-3xl shadow-sm border border-stone-100 flex gap-6">
-                   <div className="text-orange-500 shrink-0"><Users size={32}/></div>
-                   <div>
-                      <h3 className="text-xl font-black mb-3">身體與日常照顧 (BA)</h3>
-                      <p className="text-sm text-stone-500 leading-relaxed">包含基本身體清潔、協助沐浴洗頭、翻身拍背、肢體關節活動、協助進食與排泄等貼身照顧。</p>
-                   </div>
-                </div>
-                <div className="bg-white p-8 rounded-3xl shadow-sm border border-stone-100 flex gap-6">
-                   <div className="text-orange-500 shrink-0"><ClipboardCheck size={32}/></div>
-                   <div>
-                      <h3 className="text-xl font-black mb-3">專業生活支援 (BA)</h3>
-                      <p className="text-sm text-stone-500 leading-relaxed">餐食照顧、代購代領、陪同就醫、陪同外出、安全看視與家務協助（限長輩生活範圍）。</p>
-                   </div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-               <div className="text-center mb-10">
-                  <h2 className="text-3xl font-black mb-4">常見問題 FAQ</h2>
-                  <p className="text-stone-500 text-sm">整理家屬最常詢問的長照問題，幫您快速解惑。</p>
-               </div>
-               <div className="space-y-4 max-w-3xl mx-auto">
-                 {faqs.map((faq, index) => (
-                   <div key={index} className="bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden">
-                     <button 
-                       className="w-full text-left p-6 font-bold flex justify-between items-center text-gray-800 hover:text-orange-600 transition"
-                       onClick={() => setActiveFAQ(activeFAQ === index ? null : index)}
-                     >
-                       <span className="flex items-center gap-3"><HelpCircle size={18} className="text-orange-400"/> {faq.q}</span>
-                       <ChevronRight size={20} className={`transform transition-transform ${activeFAQ === index ? 'rotate-90' : ''}`} />
-                     </button>
-                     {activeFAQ === index && (
-                       <div className="px-6 pb-6 text-sm text-stone-600 leading-relaxed border-t border-stone-50 pt-4 bg-orange-50/30">
-                         {faq.a}
-                       </div>
-                     )}
-                   </div>
-                 ))}
-               </div>
-            </div>
-          </div>
         </div>
       );
 
       const CalcPage = () => (
-        <div className="pt-32 pb-24 px-6 bg-white animate-in slide-in-from-bottom-10 duration-700 min-h-screen">
-          <div className="max-w-5xl mx-auto">
+        <div className="pt-32 pb-24 px-6 bg-white min-h-screen">
+          <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <div className="bg-orange-500 w-16 h-16 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl shadow-orange-200">
                 <Calculator size={32}/>
               </div>
-              <h2 className="text-4xl font-black mb-4 tracking-tighter uppercase">長照 3.0 補助試算</h2>
-              <p className="text-stone-400 font-bold text-sm">系統將依據政府給付標準，自動計算您的預估自負總額。</p>
+              <h2 className="text-3xl md:text-4xl font-black mb-4 tracking-tighter uppercase">長照 3.0 費用試算系統</h2>
+              <p className="text-stone-400 font-bold text-sm leading-relaxed">請選擇等級與輸入服務次數，系統將自動套用政府給付標準。</p>
             </div>
 
-            <div className="grid md:grid-cols-5 gap-10 bg-stone-50 p-6 md:p-10 rounded-[40px]">
-              <div className="md:col-span-3 space-y-8">
+            <div className="grid lg:grid-cols-5 gap-10 bg-stone-50 p-4 md:p-10 rounded-[40px] border border-stone-200">
+              <div className="lg:col-span-3 space-y-8">
                 <div className="bg-white p-8 rounded-3xl shadow-sm border border-stone-100">
                   <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div> 1. 選擇等級與身份
+                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div> 1. 設定補助資格
                   </h4>
                   <div className="space-y-8">
                     <div>
-                      <p className="text-xs font-bold text-gray-500 mb-3">失能等級 (CMS)</p>
+                      <p className="text-xs font-bold text-gray-500 mb-3 italic">失能等級 (CMS等級越高 額度越高)</p>
                       <div className="grid grid-cols-4 gap-2">
                         {Object.keys(levelData).map(l => (
-                          <button key={l} onClick={() => setLevel(l)} className={`py-3 rounded-2xl font-black text-sm transition-all ${level === l ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' : 'bg-stone-100 text-stone-500 hover:bg-orange-50'}`}>{l}級</button>
+                          <button key={l} onClick={() => setLevel(l)} className={`py-3 rounded-2xl font-black text-sm transition-all ${level === l ? 'bg-orange-500 text-white shadow-lg' : 'bg-stone-100 text-stone-500 hover:bg-orange-50'}`}>{l}級</button>
                         ))}
                       </div>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-gray-500 mb-3">福利身份</p>
+                      <p className="text-xs font-bold text-gray-500 mb-3 italic">福利身份 (決定自付比例)</p>
                       <div className="grid grid-cols-3 gap-2">
                         {['16', '5', '0'].map(id => (
                           <button key={id} onClick={() => setIdentity(id)} className={`py-3 rounded-2xl font-black text-[10px] transition-all border-2 ${identity === id ? 'border-orange-500 bg-orange-50 text-orange-700' : 'border-stone-100 text-stone-400'}`}>
@@ -426,24 +299,32 @@
 
                 <div className="bg-white p-8 rounded-3xl shadow-sm border border-stone-100">
                   <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div> 2. 選擇服務與頻次 (每月)
+                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div> 2. 規劃服務內容 (每月次數)
                   </h4>
-                  <div className="space-y-3 max-h-[450px] overflow-y-auto pr-2 custom-scrollbar">
+                  <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                     {serviceItems.map(item => (
-                      <div key={item.code} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl transition-all ${quantities[item.code] > 0 ? 'bg-orange-50 border border-orange-200' : 'bg-stone-50 border border-transparent'}`}>
+                      <div key={item.code} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl transition-all ${quantities[item.code] > 0 ? 'bg-orange-50 border border-orange-200' : 'bg-stone-50'}`}>
                         <div className="mb-3 sm:mb-0">
                           <p className="text-sm font-black text-gray-800 leading-none mb-1.5">{item.name}</p>
-                          <p className="text-[10px] font-bold text-gray-400 tracking-wider">單次自付 ${calculateCoPay(item.price)} <span className="opacity-50">/ 定價 ${item.price}</span></p>
+                          <p className="text-[10px] font-bold text-gray-400 tracking-wider">
+                            定價 ${item.price} / 自付 ${calculateCoPay(item.price)}
+                          </p>
                         </div>
                         <div className="flex items-center gap-2 bg-white rounded-xl p-1 border border-stone-200 shadow-sm w-fit">
-                          <button onClick={() => {
-                            const q = (quantities[item.code] || 0) - 1;
-                            setQuantities({...quantities, [item.code]: q < 0 ? 0 : q});
-                          }} className="w-8 h-8 flex items-center justify-center rounded-lg bg-stone-100 text-stone-500 font-bold hover:bg-stone-200 transition">-</button>
-                          <span className="w-6 text-center text-sm font-black text-orange-600">{quantities[item.code] || 0}</span>
-                          <button onClick={() => {
-                            setQuantities({...quantities, [item.code]: (quantities[item.code] || 0) + 1});
-                          }} className="w-8 h-8 flex items-center justify-center rounded-lg bg-orange-500 text-white font-bold hover:bg-orange-600 transition">+</button>
+                          <button 
+                            onClick={() => handleQtyChange(item.code, (quantities[item.code] || 0) - 1)} 
+                            className="w-10 h-10 flex items-center justify-center rounded-lg bg-stone-100 text-stone-500 font-bold hover:bg-stone-200 transition"
+                          >-</button>
+                          <input 
+                            type="number" 
+                            className="w-12 text-center text-sm font-black text-orange-600 outline-none"
+                            value={quantities[item.code] || 0}
+                            onChange={(e) => handleQtyChange(item.code, e.target.value)}
+                          />
+                          <button 
+                            onClick={() => handleQtyChange(item.code, (quantities[item.code] || 0) + 1)} 
+                            className="w-10 h-10 flex items-center justify-center rounded-lg bg-orange-500 text-white font-bold hover:bg-orange-600 transition"
+                          >+</button>
                         </div>
                       </div>
                     ))}
@@ -451,36 +332,35 @@
                 </div>
               </div>
 
-              <div className="md:col-span-2">
+              <div className="lg:col-span-2">
                 <div className="sticky top-32 space-y-6">
                   <div className="bg-gray-900 rounded-[32px] p-8 text-white shadow-2xl relative overflow-hidden">
-                    <p className="text-xs font-bold text-orange-400 mb-2 uppercase tracking-widest flex justify-between">預估每月自付總額 <span className="text-white/30 text-[10px]">第 {level} 級</span></p>
+                    <p className="text-xs font-bold text-orange-400 mb-2 uppercase tracking-widest flex justify-between">預估每月自付總額 <span className="text-white/30 text-[10px]">CMS 第 {level} 級</span></p>
                     <h3 className="text-5xl font-black mb-8">${calcResults.totalCopay.toLocaleString()}</h3>
                     
                     <div className="space-y-4 border-t border-white/10 pt-6">
-                      <div className="flex justify-between text-xs">
-                        <span className="text-white/40 font-bold uppercase">已耗額度</span>
-                        <span className={`font-black ${calcResults.currentTotalCost > calcResults.subsidyLimit ? 'text-red-400' : 'text-white'}`}>
+                      <div className="flex justify-between text-[10px] font-bold">
+                        <span className="text-white/40">消耗額度明細</span>
+                        <span className={`${calcResults.currentTotalCost > calcResults.subsidyLimit ? 'text-red-400' : 'text-stone-400'}`}>
                           ${calcResults.currentTotalCost.toLocaleString()} / ${calcResults.subsidyLimit.toLocaleString()}
                         </span>
                       </div>
                       {calcResults.currentTotalCost > calcResults.subsidyLimit && (
-                        <div className="bg-red-500/20 text-red-300 p-4 rounded-xl text-[10px] font-bold leading-relaxed border border-red-500/30">
-                          ⚠ 目前選擇項目已超過政府補助上限，超出之 ${ (calcResults.currentTotalCost - calcResults.subsidyLimit).toLocaleString() } 需以全自費計算。
+                        <div className="bg-red-500/10 text-red-400 p-4 rounded-xl text-[10px] leading-relaxed border border-red-500/20 font-bold">
+                          ⚠ 您選擇的項目已超出政府補助範圍，超出部分將以「全自費」計算。
                         </div>
                       )}
                     </div>
-                    <Sun className="absolute -bottom-10 -right-10 text-white/5" size={200} />
                   </div>
 
-                  <div className="bg-white p-6 rounded-[32px] border border-stone-200 text-center shadow-sm">
-                     <p className="text-xs font-bold text-stone-400 mb-4 leading-relaxed">試算結果僅供參考，實際收費請依督導員評估計畫為準。</p>
+                  <div className="bg-white p-8 rounded-[32px] border border-stone-200 text-center shadow-sm">
+                     <p className="text-[10px] font-bold text-stone-400 mb-6 leading-relaxed">※ 最終正確金額請以督導員開立之照顧計畫為準。</p>
                      <div className="space-y-3">
-                       <a href="tel:0901071711" className="flex items-center justify-center gap-2 w-full bg-orange-500 text-white py-3.5 rounded-xl font-black shadow-md shadow-orange-100 hover:bg-orange-600 transition">
-                         <Phone size={18}/> 撥打電話洽詢
+                       <a href="tel:0901071711" className="flex items-center justify-center gap-2 w-full bg-orange-500 text-white py-4 rounded-xl font-black shadow-lg">
+                         <Phone size={18}/> 立即預約評估
                        </a>
-                       <a href="https://line.me/ti/p/~" className="flex items-center justify-center gap-2 w-full bg-green-500 text-white py-3.5 rounded-xl font-black shadow-md shadow-green-100 hover:bg-green-600 transition">
-                         <MessageCircle size={18}/> 加入 LINE 官方帳號
+                       <a href="https://line.me/ti/p/~" className="flex items-center justify-center gap-2 w-full border-2 border-green-500 text-green-600 py-3.5 rounded-xl font-black transition hover:bg-green-50">
+                         <MessageCircle size={18}/> LINE 線上諮詢
                        </a>
                      </div>
                   </div>
@@ -491,18 +371,28 @@
         </div>
       );
 
+      // 其他分頁 (About, Services) 保持先前邏輯，名稱同步
+      const AboutPage = () => (
+        <div className="pt-32 pb-24 px-6 bg-white min-h-screen">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-black mb-8 border-l-8 border-orange-500 pl-4">{fullBrandName}</h2>
+            <div className="prose prose-stone max-w-none text-stone-600 leading-relaxed space-y-6">
+              <p>本機構致力於服務彰化縣大城鄉在地長輩，由專業社工師親自經營與帶領，提供誠信、溫暖且專業的照護品質。</p>
+              <p>立案字號：府授衛長字第1150109649號</p>
+              <p>地址：彰化縣大城鄉西勢路30號</p>
+            </div>
+          </div>
+        </div>
+      );
+
       return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-stone-50">
           <Navbar />
-          
           {currentPage === 'home' && <HomePage />}
           {currentPage === 'about' && <AboutPage />}
-          {currentPage === 'services' && <ServicesPage />}
           {currentPage === 'calc' && <CalcPage />}
-
           <Footer />
-          
-          <div className="md:hidden fixed bottom-6 right-4 z-50 flex flex-col gap-3">
+          <div className="lg:hidden fixed bottom-6 right-4 z-50 flex flex-col gap-3">
             <a href="https://line.me/ti/p/~" className="bg-green-500 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center border-2 border-white">
               <MessageCircle size={24} />
             </a>
