@@ -22,7 +22,16 @@
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #ED7D31; border-radius: 10px; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
     .animate-pulse-fast { animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    
+    /* 隱藏數字輸入框的上下箭頭 */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
   </style>
 </head>
 <body class="bg-stone-50">
@@ -37,22 +46,17 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
     
-    // SVG 圖示
+    // SVG 圖示組件
     const Sun = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>;
     const Menu = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>;
     const X = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>;
-    const ChevronRight = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>;
     const Phone = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>;
     const MapPin = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>;
     const Award = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>;
     const Heart = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>;
     const ShieldCheck = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2-1 4-2 7-2 2.5 0 4.5 1 7 2a1 1 0 0 1 1 1v7z"/><path d="m9 12 2 2 4-4"/></svg>;
     const Calculator = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>;
-    const Users = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
-    const ClipboardCheck = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>;
     const MessageCircle = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>;
-    const HelpCircle = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>;
-    const ArrowDown = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>;
 
     const fullBrandName = "暖暖有限公司附設彰化縣私立暖暖居家長照機構";
 
@@ -60,7 +64,6 @@
       const [currentPage, setCurrentPage] = useState('home');
       const [isMenuOpen, setIsMenuOpen] = useState(false);
       const [scrolled, setScrolled] = useState(false);
-      const [activeFAQ, setActiveFAQ] = useState(null);
 
       // 試算器狀態
       const [level, setLevel] = useState('2');
@@ -73,6 +76,7 @@
         return () => window.removeEventListener('scroll', handleScroll);
       }, []);
 
+      // 等級與額度數據
       const levelData = {
         '2': { subsidy: 10020, co16: 1603, co5: 501 },
         '3': { subsidy: 15460, co16: 2474, co5: 773 },
@@ -83,22 +87,34 @@
         '8': { subsidy: 36180, co16: 5789, co5: 1809 },
       };
 
+      // 完整服務項目清單
       const serviceItems = [
         { code: 'BA01', name: '基本身體清潔', price: 260 },
         { code: 'BA02', name: '基本日常照顧(30分)', price: 195 },
+        { code: 'BA03', name: '測量生命徵象', price: 35 },
         { code: 'BA04', name: '協助餵食或灌食', price: 130 },
         { code: 'BA05', name: '餐食照顧', price: 310 },
         { code: 'BA07', name: '協助沐浴及洗頭', price: 325 },
+        { code: 'BA08', name: '足部照護', price: 500 },
+        { code: 'BA10', name: '翻身拍背', price: 155 },
+        { code: 'BA11', name: '肢體關節活動', price: 195 },
+        { code: 'BA12', name: '協助上(下)樓梯', price: 130 },
+        { code: 'BA13', name: '陪同外出(30分)', price: 195 },
         { code: 'BA14', name: '陪同就醫(1.5hr)', price: 685 },
         { code: 'BA15', name: '家務協助(30分)', price: 195 },
+        { code: 'BA16', name: '代購或代領或代送', price: 130 },
+        { code: 'BA17a', name: '人工氣道抽吸', price: 75 },
+        { code: 'BA17b', name: '口鼻抽吸', price: 65 },
+        { code: 'BA17c', name: '管路清潔', price: 50 },
+        { code: 'BA17d', name: '甘油球/血糖', price: 50 },
+        { code: 'BA17e', name: '依指示置入藥盒', price: 50 },
+        { code: 'BA18', name: '安全看視(30分)', price: 200 },
+        { code: 'BA20', name: '陪伴服務(30分)', price: 175 },
+        { code: 'BA22', name: '巡視服務', price: 130 },
+        { code: 'BA23', name: '協助洗頭(額外)', price: 200 },
+        { code: 'BA24', name: '協助排泄', price: 220 },
         { code: 'GA09', name: '居家喘息(2hr)', price: 770 },
         { code: 'SC09', name: '短照服務(2hr)', price: 770 },
-      ];
-
-      const faqs = [
-        { q: "要怎麼開始申請居家服務？", a: "您可以先撥打長照專線 1966，由照管中心評估失能等級後，指定由「暖暖居家」為您服務；或直接聯繫我們，我們將協助您完成後續流程。" },
-        { q: "居服員可以幫忙全家大掃除嗎？", a: "居家服務主要以「長輩本人的生活起居」為主。為了保障專業品質，無法提供全家大掃除等勞務。" },
-        { q: "費用要怎麼計算？", a: "依據失能等級與身份而定，建議使用本站「費用試算」功能獲得預估金額。" },
       ];
 
       const navigate = (page) => {
@@ -141,10 +157,11 @@
       const calcResults = getFullCalculation();
 
       const handleQtyChange = (code, val) => {
-        const newQty = Math.max(0, parseInt(val) || 0);
+        const newQty = val === "" ? 0 : Math.max(0, parseInt(val) || 0);
         setQuantities({ ...quantities, [code]: newQty });
       };
 
+      // --- 組件部分 ---
       const Navbar = () => (
         <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-md py-3' : 'bg-transparent py-6'}`}>
           <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
@@ -160,8 +177,6 @@
 
             <div className={`hidden lg:flex gap-8 items-center font-bold text-sm ${scrolled ? 'text-gray-600' : 'text-white md:text-gray-600'}`}>
               <button onClick={() => navigate('home')} className="hover:text-orange-500 transition">首頁</button>
-              <button onClick={() => navigate('about')} className="hover:text-orange-500 transition">關於暖暖</button>
-              <button onClick={() => navigate('services')} className="hover:text-orange-500 transition">服務流程</button>
               <button onClick={() => navigate('calc')} className="hover:text-orange-500 transition">費用試算</button>
               <a href="tel:0901071711" className="bg-orange-500 text-white px-5 py-2 rounded-full hover:bg-orange-600 transition shadow-lg flex items-center gap-2">
                 <Phone size={14}/> 聯繫督導
@@ -176,8 +191,6 @@
           {isMenuOpen && (
             <div className="lg:hidden fixed inset-0 top-[72px] bg-white z-40 p-6 flex flex-col gap-6 text-xl font-black text-gray-800 h-screen overflow-y-auto pb-32">
               <button onClick={() => navigate('home')} className="text-left border-b pb-4 border-gray-100">首頁</button>
-              <button onClick={() => navigate('about')} className="text-left border-b pb-4 border-gray-100">關於暖暖</button>
-              <button onClick={() => navigate('services')} className="text-left border-b pb-4 border-gray-100">服務流程</button>
               <button onClick={() => navigate('calc')} className="text-left border-b pb-4 border-gray-100">費用試算</button>
               <div className="mt-8 space-y-4">
                  <a href="tel:0901071711" className="flex items-center justify-center gap-2 bg-gray-900 text-white p-4 rounded-2xl text-center shadow-xl">
@@ -192,44 +205,6 @@
         </nav>
       );
 
-      const Footer = () => (
-        <footer className="bg-stone-900 text-white py-20 px-6">
-          <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12">
-            <div className="col-span-2">
-              <div className="flex items-center gap-3 mb-6">
-                <Sun className="text-orange-500" size={32} />
-                <span className="text-xl font-black">{fullBrandName}</span>
-              </div>
-              <p className="text-stone-400 text-sm leading-relaxed max-w-sm mb-6">
-                我們以專業、誠信、有溫度的服務，守護每一位長輩的居家生活。
-              </p>
-              <div className="inline-block bg-stone-800 text-stone-300 px-4 py-2 rounded-lg text-xs font-mono border border-stone-700">
-                立案字號：府授衛長字第1150109649號
-              </div>
-            </div>
-            <div>
-              <h4 className="font-bold mb-6 text-orange-500">快速導覽</h4>
-              <ul className="space-y-4 text-stone-400 text-sm font-medium">
-                <li className="cursor-pointer hover:text-white" onClick={() => navigate('about')}>團隊理念</li>
-                <li className="cursor-pointer hover:text-white" onClick={() => navigate('services')}>申請流程</li>
-                <li className="cursor-pointer hover:text-white" onClick={() => navigate('calc')}>長照試算</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-6 text-orange-500">服務據點</h4>
-              <ul className="space-y-4 text-stone-400 text-sm font-medium">
-                <li className="flex items-center gap-3"><Phone size={14} className="text-orange-500"/> 0901-071-711</li>
-                <li className="flex items-start gap-3"><MapPin size={14} className="text-orange-500 shrink-0 mt-1"/> 彰化縣大城鄉西勢路30號</li>
-              </ul>
-            </div>
-          </div>
-          <div className="max-w-7xl mx-auto mt-20 pt-10 border-t border-white/5 text-[10px] text-stone-600 flex flex-col md:flex-row justify-between items-center gap-4 tracking-widest font-bold">
-            <span>© 2026 {fullBrandName}</span>
-            <span>MADE IN CHANGHUA</span>
-          </div>
-        </footer>
-      );
-
       const HomePage = () => (
         <div className="animate-in fade-in duration-700">
           <section className="relative h-[90vh] flex items-center px-6 overflow-hidden bg-gray-900">
@@ -237,9 +212,7 @@
             <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?auto=format&fit=crop&q=80')] bg-cover bg-center"></div>
             <div className="max-w-7xl mx-auto w-full relative z-20 pt-10">
               <div className="max-w-3xl">
-                <span className="bg-orange-500/20 text-orange-400 border border-orange-500/30 backdrop-blur-sm px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase mb-6 inline-block">
-                  彰化大城專業照護首選
-                </span>
+                <span className="bg-orange-500/20 text-orange-400 border border-orange-500/30 backdrop-blur-sm px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase mb-6 inline-block">彰化大城專業照護首選</span>
                 <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mb-8 leading-tight">{fullBrandName}</h1>
                 <p className="text-stone-300 text-lg md:text-xl mb-12 font-medium leading-relaxed max-w-2xl">
                   守護在地長輩，減輕家庭負擔。由國家社工師親自帶領，為大城鄉親提供最暖心的居家照護服務。
@@ -266,10 +239,11 @@
                 <Calculator size={32}/>
               </div>
               <h2 className="text-3xl md:text-4xl font-black mb-4 tracking-tighter uppercase">長照 3.0 費用試算系統</h2>
-              <p className="text-stone-400 font-bold text-sm leading-relaxed">請選擇等級與輸入服務次數，系統將自動套用政府給付標準。</p>
+              <p className="text-stone-400 font-bold text-sm leading-relaxed">請選擇等級與輸入服務次數（每月），系統將自動計費。</p>
             </div>
 
             <div className="grid lg:grid-cols-5 gap-10 bg-stone-50 p-4 md:p-10 rounded-[40px] border border-stone-200">
+              {/* 左側輸入區 */}
               <div className="lg:col-span-3 space-y-8">
                 <div className="bg-white p-8 rounded-3xl shadow-sm border border-stone-100">
                   <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
@@ -277,7 +251,7 @@
                   </h4>
                   <div className="space-y-8">
                     <div>
-                      <p className="text-xs font-bold text-gray-500 mb-3 italic">失能等級 (CMS等級越高 額度越高)</p>
+                      <p className="text-xs font-bold text-gray-500 mb-3 italic">失能等級 (CMS 第2-8級)</p>
                       <div className="grid grid-cols-4 gap-2">
                         {Object.keys(levelData).map(l => (
                           <button key={l} onClick={() => setLevel(l)} className={`py-3 rounded-2xl font-black text-sm transition-all ${level === l ? 'bg-orange-500 text-white shadow-lg' : 'bg-stone-100 text-stone-500 hover:bg-orange-50'}`}>{l}級</button>
@@ -285,7 +259,7 @@
                       </div>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-gray-500 mb-3 italic">福利身份 (決定自付比例)</p>
+                      <p className="text-xs font-bold text-gray-500 mb-3 italic">福利身份 (決定自付額比例)</p>
                       <div className="grid grid-cols-3 gap-2">
                         {['16', '5', '0'].map(id => (
                           <button key={id} onClick={() => setIdentity(id)} className={`py-3 rounded-2xl font-black text-[10px] transition-all border-2 ${identity === id ? 'border-orange-500 bg-orange-50 text-orange-700' : 'border-stone-100 text-stone-400'}`}>
@@ -301,11 +275,14 @@
                   <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div> 2. 規劃服務內容 (每月次數)
                   </h4>
-                  <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                  <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
                     {serviceItems.map(item => (
-                      <div key={item.code} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl transition-all ${quantities[item.code] > 0 ? 'bg-orange-50 border border-orange-200' : 'bg-stone-50'}`}>
+                      <div key={item.code} className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl transition-all ${quantities[item.code] > 0 ? 'bg-orange-50 border border-orange-200' : 'bg-stone-50 border border-transparent'}`}>
                         <div className="mb-3 sm:mb-0">
-                          <p className="text-sm font-black text-gray-800 leading-none mb-1.5">{item.name}</p>
+                          <p className="text-sm font-black text-gray-800 leading-none mb-1.5">
+                            <span className="text-[10px] bg-white px-1.5 py-0.5 rounded border border-stone-200 mr-2 text-stone-400">{item.code}</span>
+                            {item.name}
+                          </p>
                           <p className="text-[10px] font-bold text-gray-400 tracking-wider">
                             定價 ${item.price} / 自付 ${calculateCoPay(item.price)}
                           </p>
@@ -315,12 +292,18 @@
                             onClick={() => handleQtyChange(item.code, (quantities[item.code] || 0) - 1)} 
                             className="w-10 h-10 flex items-center justify-center rounded-lg bg-stone-100 text-stone-500 font-bold hover:bg-stone-200 transition"
                           >-</button>
+                          
+                          {/* 優化輸入框：強制手機數字輸入，解決卡頓 */}
                           <input 
                             type="number" 
-                            className="w-12 text-center text-sm font-black text-orange-600 outline-none"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            onFocus={(e) => e.target.select()}
+                            className="w-14 text-center text-sm font-black text-orange-600 outline-none bg-transparent"
                             value={quantities[item.code] || 0}
                             onChange={(e) => handleQtyChange(item.code, e.target.value)}
                           />
+                          
                           <button 
                             onClick={() => handleQtyChange(item.code, (quantities[item.code] || 0) + 1)} 
                             className="w-10 h-10 flex items-center justify-center rounded-lg bg-orange-500 text-white font-bold hover:bg-orange-600 transition"
@@ -332,6 +315,7 @@
                 </div>
               </div>
 
+              {/* 右側結果區 */}
               <div className="lg:col-span-2">
                 <div className="sticky top-32 space-y-6">
                   <div className="bg-gray-900 rounded-[32px] p-8 text-white shadow-2xl relative overflow-hidden">
@@ -340,7 +324,7 @@
                     
                     <div className="space-y-4 border-t border-white/10 pt-6">
                       <div className="flex justify-between text-[10px] font-bold">
-                        <span className="text-white/40">消耗額度明細</span>
+                        <span className="text-white/40 uppercase tracking-widest">消耗額度明細</span>
                         <span className={`${calcResults.currentTotalCost > calcResults.subsidyLimit ? 'text-red-400' : 'text-stone-400'}`}>
                           ${calcResults.currentTotalCost.toLocaleString()} / ${calcResults.subsidyLimit.toLocaleString()}
                         </span>
@@ -354,10 +338,10 @@
                   </div>
 
                   <div className="bg-white p-8 rounded-[32px] border border-stone-200 text-center shadow-sm">
-                     <p className="text-[10px] font-bold text-stone-400 mb-6 leading-relaxed">※ 最終正確金額請以督導員開立之照顧計畫為準。</p>
+                     <p className="text-[10px] font-bold text-stone-400 mb-6 leading-relaxed">※ 以上試算僅供初步參考，最終正確金額請以督導員評估後開立之照顧計畫為準。</p>
                      <div className="space-y-3">
-                       <a href="tel:0901071711" className="flex items-center justify-center gap-2 w-full bg-orange-500 text-white py-4 rounded-xl font-black shadow-lg">
-                         <Phone size={18}/> 立即預約評估
+                       <a href="tel:0901071711" className="flex items-center justify-center gap-2 w-full bg-orange-500 text-white py-4 rounded-xl font-black shadow-lg hover:bg-orange-600 transition">
+                         <Phone size={18}/> 聯繫居服督導
                        </a>
                        <a href="https://line.me/ti/p/~" className="flex items-center justify-center gap-2 w-full border-2 border-green-500 text-green-600 py-3.5 rounded-xl font-black transition hover:bg-green-50">
                          <MessageCircle size={18}/> LINE 線上諮詢
@@ -371,27 +355,43 @@
         </div>
       );
 
-      // 其他分頁 (About, Services) 保持先前邏輯，名稱同步
-      const AboutPage = () => (
-        <div className="pt-32 pb-24 px-6 bg-white min-h-screen">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-black mb-8 border-l-8 border-orange-500 pl-4">{fullBrandName}</h2>
-            <div className="prose prose-stone max-w-none text-stone-600 leading-relaxed space-y-6">
-              <p>本機構致力於服務彰化縣大城鄉在地長輩，由專業社工師親自經營與帶領，提供誠信、溫暖且專業的照護品質。</p>
-              <p>立案字號：府授衛長字第1150109649號</p>
-              <p>地址：彰化縣大城鄉西勢路30號</p>
+      const Footer = () => (
+        <footer className="bg-stone-900 text-white py-16 px-6">
+          <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-12">
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-3 mb-6">
+                <Sun className="text-orange-500" size={32} />
+                <span className="text-xl font-black tracking-tight">{fullBrandName}</span>
+              </div>
+              <p className="text-stone-400 text-sm leading-relaxed max-w-md">
+                由專業社工師親自督導，致力於彰化大城地區，為家長提供最暖心的居家照護服務。
+              </p>
+              <div className="mt-6 inline-block bg-stone-800 text-stone-300 px-4 py-2 rounded-lg text-xs font-mono border border-stone-700">
+                立案字號：府授衛長字第1150109649號
+              </div>
+            </div>
+            <div>
+              <h4 className="font-bold mb-6 text-orange-500">服務資訊</h4>
+              <ul className="space-y-4 text-stone-400 text-sm font-medium">
+                <li className="flex items-center gap-3"><Phone size={14} className="text-orange-500"/> 0901-071-711</li>
+                <li className="flex items-start gap-3"><MapPin size={14} className="text-orange-500 shrink-0 mt-1"/> 彰化縣大城鄉西勢路30號</li>
+              </ul>
             </div>
           </div>
-        </div>
+          <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/5 text-[10px] text-stone-600 uppercase tracking-widest font-bold text-center md:text-left">
+            © 2026 Nuan Nuan Home Care. All Rights Reserved.
+          </div>
+        </footer>
       );
 
       return (
         <div className="min-h-screen bg-stone-50">
           <Navbar />
           {currentPage === 'home' && <HomePage />}
-          {currentPage === 'about' && <AboutPage />}
           {currentPage === 'calc' && <CalcPage />}
           <Footer />
+          
+          {/* 行動版浮動聯絡按鈕 */}
           <div className="lg:hidden fixed bottom-6 right-4 z-50 flex flex-col gap-3">
             <a href="https://line.me/ti/p/~" className="bg-green-500 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center border-2 border-white">
               <MessageCircle size={24} />
