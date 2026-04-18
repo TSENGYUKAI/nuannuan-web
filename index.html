@@ -242,8 +242,8 @@
     // --- 子頁面組件 ---
 
     const HomePage = ({ onNavigate }) => (
-      <div className="animate-page">
-        <section className="relative min-h-[90vh] flex items-center px-6 overflow-hidden hero-gradient py-20">
+      <div className="animate-page pb-24">
+        <section className="relative min-h-[75vh] flex items-center px-6 overflow-hidden hero-gradient py-20">
           <div className="absolute top-10 right-10 text-orange-200/40 animate-sun z-0">
              <Sun size={400} />
           </div>
@@ -288,6 +288,38 @@
                     <p className="text-stone-400 font-bold text-xs uppercase tracking-widest">Dacheng Local Care</p>
                  </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 首頁：最新消息區塊 */}
+        <section className="px-6 mt-8 md:mt-16">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center gap-4 mb-12">
+               <div className="relative">
+                 <div className="absolute inset-0 bg-orange-400 rounded-xl animate-ping opacity-30"></div>
+                 <div className="bg-orange-100 p-3 rounded-xl text-orange-600 relative z-10"><Newspaper size={32}/></div>
+               </div>
+               <h3 className="text-3xl font-black text-gray-800 tracking-tight flex items-center gap-4">
+                 最新消息
+                 <span className="bg-red-500 text-white text-xs px-3 py-1 rounded-full animate-pulse shadow-lg shadow-red-500/30 font-black tracking-widest">HOT</span>
+               </h3>
+            </div>
+            <div className="grid gap-6">
+              {newsList.map((news, idx) => (
+                <div key={idx} 
+                     className="animate-page relative bg-white p-6 md:p-8 rounded-[30px] border-2 border-stone-50 hover:border-orange-500 hover:shadow-[0_20px_40px_-10px_rgba(237,125,49,0.25)] hover:-translate-y-2 transition-all duration-300 flex flex-col md:flex-row md:items-center gap-6 group cursor-default"
+                     style={{ animationDelay: `${idx * 150}ms`, animationFillMode: 'both' }}>
+                   
+                   <div className="bg-stone-50 text-stone-500 font-black px-5 py-2.5 rounded-2xl text-sm shrink-0 flex items-center gap-2 border border-stone-100 group-hover:bg-orange-500 group-hover:text-white group-hover:border-orange-500 transition-colors duration-300">
+                      <Calendar size={18} className={idx === 0 ? "group-hover:animate-bounce" : ""} /> {news.date}
+                   </div>
+                   <div>
+                      <h4 className="text-xl font-black text-gray-800 mb-2 group-hover:text-orange-600 transition-colors duration-300">{news.title}</h4>
+                      <p className="text-stone-500 font-bold text-sm leading-relaxed">{news.desc}</p>
+                   </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -519,56 +551,23 @@
             <p className="text-stone-500 text-sm font-bold italic underline decoration-orange-200 decoration-8 underline-offset-[-2px]">追蹤我們的最新動態與長照資訊</p>
           </div>
           
-          <div className="space-y-20">
-            {/* 最新消息區塊 */}
-            <section>
-              <div className="flex items-center gap-3 mb-8">
-                 <div className="bg-orange-100 p-2 rounded-xl text-orange-600"><Newspaper size={28}/></div>
-                 <h3 className="text-2xl font-black text-gray-800 tracking-tight">最新消息區塊</h3>
-              </div>
-              <div className="grid gap-5">
-                {newsList.map((news, idx) => (
-                  <div key={idx} className="bg-white p-6 md:p-8 rounded-[30px] border-2 border-stone-50 hover:border-orange-500 hover:shadow-[0_10px_30px_-10px_rgba(237,125,49,0.2)] transition-all flex flex-col md:flex-row md:items-center gap-6 group">
-                     <div className="bg-stone-50 text-stone-500 font-black px-5 py-2.5 rounded-2xl text-sm shrink-0 flex items-center gap-2 border border-stone-100 group-hover:bg-orange-500 group-hover:text-white group-hover:border-orange-500 transition-colors">
-                        <Calendar size={18}/> {news.date}
-                     </div>
-                     <div>
-                        <h4 className="text-xl font-black text-gray-800 mb-2 group-hover:text-orange-600 transition-colors">{news.title}</h4>
-                        <p className="text-stone-500 font-bold text-sm leading-relaxed">{news.desc}</p>
-                     </div>
-                  </div>
-                ))}
-              </div>
-            </section>
+          <div className="grid md:grid-cols-2 gap-8">
+            <a href={fbUrl} target="_blank" className="q-card p-10 flex flex-col items-center text-center gap-6 hover:-translate-y-2 transition-all group">
+               <div className="bg-blue-50 text-blue-600 w-24 h-24 rounded-[30px] flex items-center justify-center group-hover:scale-110 transition-transform">
+                 <Facebook size={48}/>
+               </div>
+               <h4 className="text-2xl font-black text-gray-800">Facebook 粉絲專頁</h4>
+               <p className="text-stone-500 font-bold">了解我們的日常照護點滴與活動花絮</p>
+            </a>
 
-            <hr className="border-stone-200" />
-
-            {/* 社群連結區塊 */}
-            <section>
-              <div className="flex items-center gap-3 mb-8">
-                 <div className="bg-orange-100 p-2 rounded-xl text-orange-600"><MessageCircle size={28}/></div>
-                 <h3 className="text-2xl font-black text-gray-800 tracking-tight">社群連結區塊</h3>
-              </div>
-              <div className="grid md:grid-cols-2 gap-8">
-                <a href={fbUrl} target="_blank" className="q-card p-10 flex flex-col items-center text-center gap-6 hover:-translate-y-2 transition-all group">
-                   <div className="bg-blue-50 text-blue-600 w-24 h-24 rounded-[30px] flex items-center justify-center group-hover:scale-110 transition-transform">
-                     <Facebook size={48}/>
-                   </div>
-                   <h4 className="text-2xl font-black text-gray-800">Facebook 粉絲專頁</h4>
-                   <p className="text-stone-500 font-bold">了解我們的日常照護點滴與活動花絮</p>
-                </a>
-
-                <a href={igUrl} target="_blank" className="q-card p-10 flex flex-col items-center text-center gap-6 hover:-translate-y-2 transition-all group">
-                   <div className="bg-pink-50 text-pink-600 w-24 h-24 rounded-[30px] flex items-center justify-center group-hover:scale-110 transition-transform">
-                     <Instagram size={48}/>
-                   </div>
-                   <h4 className="text-2xl font-black text-gray-800">Instagram 官方帳號</h4>
-                   <p className="text-stone-500 font-bold">透過影像感受暖暖的溫度與活力</p>
-                </a>
-              </div>
-            </section>
+            <a href={igUrl} target="_blank" className="q-card p-10 flex flex-col items-center text-center gap-6 hover:-translate-y-2 transition-all group">
+               <div className="bg-pink-50 text-pink-600 w-24 h-24 rounded-[30px] flex items-center justify-center group-hover:scale-110 transition-transform">
+                 <Instagram size={48}/>
+               </div>
+               <h4 className="text-2xl font-black text-gray-800">Instagram 官方帳號</h4>
+               <p className="text-stone-500 font-bold">透過影像感受暖暖的溫度與活力</p>
+            </a>
           </div>
-
         </div>
       </div>
     );
@@ -717,6 +716,11 @@
         return () => window.removeEventListener('scroll', handleScroll);
       }, []);
 
+      // 新增：監聽頁面變更，確保每次切換頁面後，都能確實平滑捲動到最上方
+      useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, [currentPage]);
+
       const calcResults = useMemo(() => {
         const data = levelData[level];
         const subsidyLimit = data.subsidy;
@@ -747,7 +751,7 @@
       const navigate = (page) => {
         setCurrentPage(page);
         setIsMenuOpen(false);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // 原本這裡的 window.scrollTo 可以保留，或交由上方的 useEffect 統一處理
       };
 
       return (
