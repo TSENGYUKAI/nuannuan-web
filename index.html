@@ -845,13 +845,13 @@
           </main>
 
           <footer className="bg-stone-900 text-white py-24 px-10 mt-auto border-t-[12px] border-orange-500">
-            <div className="max-w-[1400px] mx-auto grid md:grid-cols-2 gap-24 text-left px-4">
-              <div>
+            <div className="max-w-[1400px] mx-auto grid lg:grid-cols-12 gap-16 lg:gap-24 text-left px-4">
+              <div className="lg:col-span-7 xl:col-span-7">
                 <div className="flex items-center gap-5 mb-12">
                   <div className="bg-orange-500 p-3 rounded-3xl animate-sun shadow-2xl"><Sun size={56} /></div>
-                  <span className="text-xl md:text-2xl font-black tracking-tighter leading-tight uppercase tracking-widest font-black">{fullBrandName}</span>
+                  <span className="text-xl md:text-2xl font-black leading-tight uppercase tracking-widest">{fullBrandName}</span>
                 </div>
-                <p className="text-stone-400 text-lg md:text-xl leading-relaxed max-w-xl mb-12 font-black italic font-black">
+                <p className="text-stone-400 text-lg md:text-xl leading-relaxed max-w-xl mb-12 font-black italic">
                    在大城鄉的每一個朝陽升起之際，我們始終守候。我們連結社區資源，讓長輩享有高品質的居家生活。
                 </p>
                 <div className="inline-block bg-stone-800 text-stone-300 px-8 py-5 rounded-[30px] text-xs font-mono border border-stone-700 font-black tracking-widest leading-relaxed">
@@ -859,18 +859,18 @@
                   <div>統一編號：61005869</div>
                 </div>
               </div>
-              <div className="space-y-16">
-                <h4 className="font-black text-orange-500 text-base uppercase tracking-[0.4em] italic text-left underline decoration-orange-500/30 decoration-4 underline-offset-[12px] font-black">聯繫我們 / CONTACT US</h4>
+              <div className="lg:col-span-5 xl:col-span-4 xl:col-start-9 space-y-16 mt-8 lg:mt-0">
+                <h4 className="font-black text-orange-500 text-base uppercase tracking-[0.4em] italic text-left underline decoration-orange-500/30 decoration-4 underline-offset-[12px]">聯繫我們 / CONTACT US</h4>
                 <div className="text-lg md:text-xl text-stone-300 space-y-10 font-black">
-                  <div className="flex items-center gap-8 group cursor-pointer hover:text-orange-400 transition-all font-black">
+                  <div className="flex items-center gap-8 group cursor-pointer hover:text-orange-400 transition-all">
                     <div className="bg-stone-800 p-5 rounded-[30px] group-hover:bg-orange-500 group-hover:text-white transition-all shadow-xl shrink-0"><Phone size={32}/></div> 
                     <span className="whitespace-nowrap font-black">0901-071-711</span>
                   </div>
-                  <div className="flex items-center gap-8 group hover:text-orange-400 transition-all font-black">
+                  <div className="flex items-center gap-8 group hover:text-orange-400 transition-all">
                     <div className="bg-stone-800 p-5 rounded-[30px] group-hover:bg-orange-500 group-hover:text-white transition-all shadow-xl shrink-0"><MapPin size={32} className="shrink-0"/></div> 
                     <span className="whitespace-nowrap font-black leading-snug">彰化縣大城鄉西勢路30號</span>
                   </div>
-                  <div className="flex items-center gap-8 group hover:text-green-400 transition-all font-black">
+                  <div className="flex items-center gap-8 group hover:text-green-400 transition-all">
                     <div className="bg-stone-800 p-5 rounded-[30px] group-hover:bg-green-500 group-hover:text-white transition-all shadow-xl shrink-0"><MessageCircle size={32}/></div> 
                     <span className="whitespace-nowrap font-black">LINE ID: @957jphho</span>
                   </div>
