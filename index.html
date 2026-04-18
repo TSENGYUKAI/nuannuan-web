@@ -205,7 +205,7 @@
       { date: "2026.01.01", title: "115年度長照補助新制上路說明", desc: "配合政府政策更新，今年起失智症照顧對象年齡下修，新增急性後期整合照護計畫(PAC)收案對象，歡迎來電洽詢詳細資格。" }
     ];
 
-    // --- 活動照片圖庫 (更換了第一張連結) ---
+    // --- 活動照片圖庫 ---
     const photoList = [
       { title: "溫馨照顧陪伴", url: "https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?auto=format&fit=crop&w=800&q=80" },
       { title: "專業團隊會議", url: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80" },
@@ -287,9 +287,9 @@
           </div>
         </section>
 
-        {/* 首頁：最新消息區塊 */}
+        {/* 首頁：最新消息區塊 - 已調整寬度與暖暖花絮對齊，並放大卡片框框 */}
         <section className="px-6 mt-8 md:mt-16">
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <div className="flex items-center gap-4 mb-12">
                <div className="relative">
                  <div className="absolute inset-0 bg-orange-400 rounded-xl animate-ping opacity-30"></div>
@@ -300,18 +300,21 @@
                  <span className="bg-red-500 text-white text-xs px-3 py-1 rounded-full animate-pulse shadow-lg shadow-red-500/30 font-black tracking-widest">HOT</span>
                </h3>
             </div>
-            <div className="grid gap-6">
+            <div className="grid gap-8">
               {newsList.map((news, idx) => (
                 <div key={idx} 
-                     className="animate-page relative bg-white p-6 md:p-8 rounded-[30px] border-2 border-stone-50 hover:border-orange-500 hover:shadow-[0_20px_40px_-10px_rgba(237,125,49,0.25)] hover:-translate-y-2 transition-all duration-300 flex flex-col md:flex-row md:items-center gap-6 group cursor-default"
+                     className="animate-page relative bg-white p-8 md:p-10 rounded-[45px] border-2 border-stone-50 hover:border-orange-500 hover:shadow-[0_25px_50px_-12px_rgba(237,125,49,0.3)] hover:-translate-y-2 transition-all duration-300 flex flex-col md:flex-row md:items-center gap-8 group cursor-default"
                      style={{ animationDelay: `${idx * 150}ms`, animationFillMode: 'both' }}>
                    
-                   <div className="bg-stone-50 text-stone-500 font-black px-5 py-2.5 rounded-2xl text-sm shrink-0 flex items-center gap-2 border border-stone-100 group-hover:bg-orange-500 group-hover:text-white group-hover:border-orange-500 transition-colors duration-300">
-                      <Calendar size={18} className={idx === 0 ? "group-hover:animate-bounce" : ""} /> {news.date}
+                   <div className="bg-stone-50 text-stone-500 font-black px-6 py-3 rounded-3xl text-base shrink-0 flex items-center gap-2 border border-stone-100 group-hover:bg-orange-500 group-hover:text-white group-hover:border-orange-500 transition-colors duration-300 shadow-sm">
+                      <Calendar size={20} className={idx === 0 ? "group-hover:animate-bounce" : ""} /> {news.date}
                    </div>
-                   <div>
-                      <h4 className="text-xl font-black text-gray-800 mb-2 group-hover:text-orange-600 transition-colors duration-300">{news.title}</h4>
-                      <p className="text-stone-500 font-bold text-sm leading-relaxed">{news.desc}</p>
+                   <div className="flex-grow">
+                      <h4 className="text-2xl md:text-3xl font-black text-gray-800 mb-3 group-hover:text-orange-600 transition-colors duration-300 tracking-tight">{news.title}</h4>
+                      <p className="text-stone-500 font-bold text-base md:text-lg leading-relaxed">{news.desc}</p>
+                   </div>
+                   <div className="hidden md:block opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-orange-300">
+                      <ChevronRight size={40} />
                    </div>
                 </div>
               ))}
@@ -812,7 +815,7 @@
             {currentPage === 'privacy' && <PolicyPage 
               title="隱私權保護政策" 
               icon={<Lock size={36} />}
-              content={`歡迎您造訪「暖暖居家長照機構官方網站」（以下簡稱本網站），為了讓您能夠安心的使用本網站的各項服務與資訊，特此向您說明本網站的隱私權保護政策，以保障您的權益，請您詳閱下列內容：\n\n一、隱私權保護政策的適用範圍\n隱私權保護政策內容，包括本網站如何處理在您使用網站服務時收集到的個人識別資料。隱私權保護政策不適用於本網站以外的相關連結網站，也不適用於非本網站所委託或參與管理的人員。\n\n二、個人資料的蒐集、處理及利用方式\n• 當您造訪本網站或使用本網站所提供之功能服務時，我們將視該服務功能性質，請您提供必要的個人資料，並在該特定目的範圍內處理及利用您的個人資料；非經您書面同意，本網站不會將個人資料用於其他用途。\n• 本網站在您使用線上試算、客服信箱、問卷調查等互動性功能時，會保留您所提供的姓名、電子郵件地址、聯絡方式及使用時間等。\n• 於一般瀏覽時，伺服器會自行記錄相關行徑，包括您使用連線設備的IP位址、使用時間、使用的瀏覽器、瀏覽及點選資料記錄等，做為我們增進網站服務的參考依據，此記錄為內部應用，決不對外公佈。\n\n三、資料之保護\n本網站主機均設有防火牆、防毒系統等相關的各項資訊安全設備及必要的安全防護措施，加以保護網站及您的個人資料採用嚴格的保護措施，只由經過授權的人員才能接觸您的個人資料，相關處理人員皆簽有保密合約，如有違反保密義務者，將受相關法律處分。\n\n四、網站對外的相關連結\n本網站的網頁提供其他網站的網路連結，您也可經由本網站所提供的連結，點選進入其他網站。但該連結網站不適用本網站的隱私權保護政策，您必須參考該連結網站中的隱私權保護政策。\n\n五、隱私權保護政策之修正\n本網站隱私權保護政策將因應需求隨時進行修正，修正後的條款將刊登於網站上。`} 
+              content={`歡迎您造訪「暖暖居家長照機構官方網站」（以下簡稱本網站），為了讓您能夠安心的使用本網站的各項服務與資訊，特此向您說明本網站的隱私權保護政策，以保障您的權益，請您詳閱下列內容：\n\n一、隱私權保護政策的適用範圍\n隱私權保護政策內容，包括本網站如何處理在您使用網站服務時收集到的個人識別資料。隱私權保護政策不適用於本網站以外的相關連結網站，也不適用於非本網站所委託 or 參與管理的人員。\n\n二、個人資料的蒐集、處理及利用方式\n• 當您造訪本網站或使用本網站所提供之功能服務時，我們將視該服務功能性質，請您提供必要的個人資料，並在該特定目的範圍內處理及利用您的個人資料；非經您書面同意，本網站不會將個人資料用於其他用途。\n• 本網站在您使用線上試算、客服信箱、問卷調查等互動性功能時，會保留您所提供的姓名、電子郵件地址、聯絡方式及使用時間等。\n• 於一般瀏覽時，伺服器會自行記錄相關行徑，包括您使用連線設備的IP位址、使用時間、使用的瀏覽器、瀏覽及點選資料記錄等，做為我們增進網站服務的參考依據，此記錄為內部應用，決不對外公佈。\n\n三、資料之保護\n本網站主機均設有防火牆、防毒系統等相關的各項資訊安全設備及必要的安全防護措施，加以保護網站及您的個人資料採用嚴格的保護措施，只由經過授權的人員才能接觸您的個人資料，相關處理人員皆簽有保密合約，如有違反保密義務者，將受相關法律處分。\n\n四、網站對外的相關連結\n本網站的網頁提供其他網站的網路連結，您也可經由本網站所提供的連結，點選進入其他網站。但該連結網站不適用本網站的隱私權保護政策，您必須參考該連結網站中的隱私權保護政策。\n\n五、隱私權保護政策之修正\n本網站隱私權保護政策將因應需求隨時進行修正，修正後的條款將刊登於網站上。`} 
             />}
             {currentPage === 'security' && <PolicyPage 
               title="資訊安全政策" 
