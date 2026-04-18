@@ -24,14 +24,14 @@
   <meta property="og:type" content="website">
 
   <!-- 4. 瀏覽器分頁標籤與書籤 -->
-  <!-- 針對一般瀏覽器 (Chrome, Edge) 的標準橘色太陽 SVG -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ED7D31' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='4' fill='%23ED7D31' fill-opacity='0.1'/%3E%3Cpath d='M12 2v2'/%3E%3Cpath d='M12 20v2'/%3E%3Cpath d='m4.93 4.93 1.41 1.41'/%3E%3Cpath d='m17.66 17.66 1.41 1.41'/%3E%3Cpath d='M2 12h2'/%3E%3Cpath d='M20 12h2'/%3E%3Cpath d='m6.34 17.66-1.41 1.41'/%3E%3Cpath d='m19.07 4.93-1.41 1.41'/%3E%3C/svg%3E">
+  <!-- 針對一般瀏覽器 (改用外部 CDN 實體網址，徹底解決 Safari 阻擋內建代碼的問題) -->
+  <link rel="icon" type="image/svg+xml" href="https://api.iconify.design/lucide/sun.svg?color=%23ED7D31">
   
-  <!-- 針對 Safari 標籤頁專用 (解決灰色地球問題)：必須是純黑色 stroke='black'，並指定 color="#ED7D31" 讓蘋果系統自己塗色 -->
-  <link rel="mask-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v2'/%3E%3Cpath d='M12 20v2'/%3E%3Cpath d='m4.93 4.93 1.41 1.41'/%3E%3Cpath d='m17.66 17.66 1.41 1.41'/%3E%3Cpath d='M2 12h2'/%3E%3Cpath d='M20 12h2'/%3E%3Cpath d='m6.34 17.66-1.41 1.41'/%3E%3Cpath d='m19.07 4.93-1.41 1.41'/%3E%3C/svg%3E" color="#ED7D31">
+  <!-- Safari 標籤頁專用 (必須是純黑實體 SVG 網址，並由蘋果系統自行套用 color 的橘色) -->
+  <link rel="mask-icon" href="https://api.iconify.design/lucide/sun.svg?color=black" color="#ED7D31">
 
-  <!-- iOS 主畫面圖示備案 (帶橘色底的太陽) -->
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ED7D31' rx='20'/%3E%3Ctext y='50' x='50' font-size='60' dominant-baseline='central' text-anchor='middle'%3E%E2%98%80%EF%B8%8F%3C/text%3E%3C/svg%3E">
+  <!-- iOS 主畫面圖示備案 -->
+  <link rel="apple-touch-icon" href="https://api.iconify.design/lucide/sun.svg?color=%23ED7D31">
 
   <!-- 5. JSON-LD 結構化資料 -->
   <script type="application/ld+json">
