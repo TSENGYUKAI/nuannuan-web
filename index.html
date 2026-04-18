@@ -31,7 +31,6 @@
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', 'G-N4JQ7VRLTR', {
-      // 關閉預設的網頁瀏覽，改由 React 手動發送，以精準追蹤單頁應用程式 (SPA)
       send_page_view: false 
     });
   </script>
@@ -109,23 +108,6 @@
     .gallery-overlay {
       background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
     }
-
-    .admin-input {
-      width: 100%;
-      padding: 1rem;
-      border-radius: 1.5rem;
-      border: 2px solid #F3F4F6;
-      background-color: #F9FAFB;
-      outline: none;
-      transition: all 0.3s;
-      font-weight: 700;
-      color: #4b5563;
-    }
-    .admin-input:focus {
-      border-color: #ED7D31;
-      background-color: white;
-      box-shadow: 0 0 0 4px rgba(237, 125, 49, 0.1);
-    }
   </style>
 </head>
 <body class="text-stone-700">
@@ -153,7 +135,7 @@
     const igUrl = "https://www.instagram.com/nuannuanltc?igsh=MWl4NTNtdmQ0Y2h6aQ%3D%3D&utm_source=qr";
     
     // 照片分類清單設定
-    const PHOTO_CATEGORIES = ['居家服務', '專業陪伴', '社區活動'];
+    const PHOTO_CATEGORIES = ['溫馨照顧陪伴', '專業團隊', '社區活動交流'];
 
     const levelData = {
       '2': { subsidy: 10020, respite: 32340, short: 87780 },
@@ -231,17 +213,33 @@
 
     const allServiceItems = serviceCategories.flatMap(c => c.items);
 
-    // --- 初始資料 (用作預設值，若無串接 GAS 則顯示這些) ---
+    // --- 初始資料 ---
     const initialNewsList = [
       { id: 1, date: "2026.04.18", title: "暖暖居家長照機構官方網站上線！", desc: "為了提供家屬與民眾更便捷的資訊管道，我們的官方網站正式啟用。歡迎多加利用線上費用試算與服務介紹功能。" },
       { id: 2, date: "2026.01.01", title: "115年度長照補助新制上路說明", desc: "配合政府政策更新，今年起失智症照顧對象年齡下修，新增急性後期整合照護計畫(PAC)收案對象，歡迎來電洽詢詳細資格。" }
     ];
 
     const initialPhotoList = [
-      { id: 1, title: "溫馨照顧陪伴", category: "居家服務", description: "照服員細心陪伴長輩，協助日常生活起居，讓每一天都充滿笑容與安心。", url: "https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?auto=format&fit=crop&w=800&q=80", isPublished: true },
-      { id: 2, title: "專業團隊會議", category: "專業陪伴", description: "由社工師領軍的專業團隊定期開會，針對個案狀況調整最佳的照護計畫。", url: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80", isPublished: true },
-      { id: 3, title: "社區互動交流", category: "社區活動", description: "我們積極參與並舉辦社區活動，促進長輩間的互動，維持身心活力與健康。", url: "https://images.unsplash.com/photo-1573497620053-ea5300f94f21?auto=format&fit=crop&w=800&q=80", isPublished: true }
+      { id: 1, title: "溫馨照顧陪伴", category: "溫馨照顧陪伴", description: "照服員細心陪伴長輩，協助日常生活起居，讓每一天都充滿笑容與安心。", url: "https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?auto=format&fit=crop&w=800&q=80", isPublished: true },
+      { id: 2, title: "專業團隊會議", category: "專業團隊", description: "由社工師領軍的專業團隊定期開會，針對個案狀況調整最佳的照護計畫。", url: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80", isPublished: true },
+      { id: 3, title: "社區互動交流", category: "社區活動交流", description: "我們積極參與並舉辦社區活動，促進長輩間的互動，維持身心活力與健康。", url: "https://images.unsplash.com/photo-1573497620053-ea5300f94f21?auto=format&fit=crop&w=800&q=80", isPublished: true }
     ];
+
+    // 💡 新增：Google Drive 圖片網址自動轉換器 (解決近期 Google 阻擋外連導致的破圖問題)
+    const getValidImageUrl = (url) => {
+      if (!url) return '';
+      // 處理已經被存成 uc?export=view 的舊資料 (將已存於資料庫的舊網址修復)
+      if (url.includes('drive.google.com/uc')) {
+         const match = url.match(/id=([a-zA-Z0-9_-]+)/);
+         if (match) return `https://lh3.googleusercontent.com/d/${match[1]}`;
+      }
+      // 處理原始 Google Drive 網址
+      if (url.includes('drive.google.com')) {
+         const match = url.match(/[\/?&]id=([a-zA-Z0-9_-]+)/) || url.match(/file\/d\/([a-zA-Z0-9_-]+)/);
+         if (match) return `https://lh3.googleusercontent.com/d/${match[1]}`;
+      }
+      return url;
+    };
 
     // --- SVG 圖示組件 ---
     const Sun = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="4" fill="currentColor" fillOpacity="0.1"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>;
@@ -271,9 +269,8 @@
     const Instagram = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>;
 
     // --- 後台管理組件 ---
-    const AdminPage = ({ newsData, setNewsData, photoData, setPhotoData, isPhotoLoading, togglePublishPhoto, onLogout }) => {
+    const AdminPage = ({ newsData, setNewsData, photoData, setPhotoData, isPhotoLoading, syncDrivePhotos, togglePublishPhoto, onLogout }) => {
       const [adminTab, setAdminTab] = useState('dashboard');
-      const fileInputRef = useRef(null); 
       
       const [newNewsTitle, setNewNewsTitle] = useState('');
       const [newNewsDesc, setNewNewsDesc] = useState('');
@@ -281,6 +278,21 @@
       // 照片編輯 Modal 狀態
       const [editingPhoto, setEditingPhoto] = useState(null);
       
+      // Looker Studio 報表網址狀態 (儲存於瀏覽器 localStorage)
+      const [lookerUrl, setLookerUrl] = useState(() => localStorage.getItem('lookerUrl') || '');
+      const [isEditingLooker, setIsEditingLooker] = useState(!localStorage.getItem('lookerUrl'));
+      const [tempLookerUrl, setTempLookerUrl] = useState(() => localStorage.getItem('lookerUrl') || '');
+      
+      const handleSaveLookerUrl = () => {
+        if (tempLookerUrl && !tempLookerUrl.startsWith('http')) {
+          alert('請輸入有效的報表嵌入網址 (需包含 http 或 https)');
+          return;
+        }
+        localStorage.setItem('lookerUrl', tempLookerUrl);
+        setLookerUrl(tempLookerUrl);
+        setIsEditingLooker(false);
+      };
+
       const handleAddNews = () => {
         if(!newNewsTitle || !newNewsDesc) {
           alert('請輸入標題與內容。');
@@ -302,7 +314,7 @@
         setNewsData([newItem, ...newsData]);
         setNewNewsTitle('');
         setNewNewsDesc('');
-        alert('✅ 最新消息已成功暫存！\n\n(提醒：目前為純前端模式，重新整理網頁後資料會消失。未來可串接 Google Apps Script 永久儲存)');
+        alert('✅ 最新消息已成功發佈並儲存至本機資料庫！');
       };
 
       const handleDeleteNews = (id) => {
@@ -311,33 +323,8 @@
         }
       };
 
-      // 處理真實檔案選擇並生成預覽 URL
-      const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const localPreviewUrl = URL.createObjectURL(file);
-        
-        const newPhoto = {
-          id: Date.now(),
-          title: file.name.split('.')[0],
-          category: PHOTO_CATEGORIES[0], // 預設分類
-          description: '',
-          url: localPreviewUrl,
-          isPublished: false // 新增的照片預設「不發佈」，僅供後台預覽
-        };
-
-        // 載入後先加入清單，並立刻開啟編輯視窗讓使用者填寫細節
-        setPhotoData([newPhoto, ...photoData]);
-        setEditingPhoto(newPhoto);
-      };
-
-      const handleUploadPhotoClick = () => {
-        fileInputRef.current.click();
-      };
-
       const handleDeletePhoto = (id) => {
-        if(confirm('確定要刪除這張照片嗎？')) {
+        if(confirm('確定要從網站資料庫刪除這張照片嗎？\n(注意：這不會刪除您 Google Drive 裡的原始檔案)')) {
           setPhotoData(photoData.filter(item => item.id !== id));
         }
       };
@@ -347,7 +334,7 @@
         e.preventDefault();
         setPhotoData(photoData.map(p => p.id === editingPhoto.id ? editingPhoto : p));
         setEditingPhoto(null);
-        alert('照片資訊已更新！');
+        alert('照片資訊已成功更新！');
       };
 
       return (
@@ -415,11 +402,49 @@
                         </div>
                       </div>
 
-                      <div className="bg-stone-50 p-8 rounded-3xl border border-stone-100 shadow-sm h-64 flex flex-col items-center justify-center relative overflow-hidden group">
-                        <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity" style={{ background: 'repeating-linear-gradient(45deg, transparent, transparent 10px, #ED7D31 10px, #ED7D31 20px)' }}></div>
-                        <BarChart size={48} className="text-stone-300 mb-4 relative z-10" />
-                        <p className="text-stone-500 font-black relative z-10 text-lg">圖表功能擴充準備區</p>
-                        <p className="text-stone-400 text-xs font-bold mt-2 relative z-10">此處未來可登入檢視 Google Analytics (GA4) 完整報表</p>
+                      <div className="bg-stone-50 p-6 md:p-8 rounded-3xl border border-stone-100 shadow-sm min-h-[500px] flex flex-col relative overflow-hidden group">
+                        <div className="flex justify-between items-center mb-6">
+                           <h4 className="font-black text-gray-800 flex items-center gap-2">
+                             <BarChart size={20} className="text-orange-500"/> GA4 網站流量即時報表
+                           </h4>
+                           {!isEditingLooker && (
+                              <button onClick={() => setIsEditingLooker(true)} className="text-xs font-black text-stone-400 hover:text-orange-500 transition-colors underline">修改報表來源</button>
+                           )}
+                        </div>
+
+                        {isEditingLooker || !lookerUrl ? (
+                           <div className="flex-1 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-stone-200 rounded-2xl bg-white relative z-10">
+                               <Cloud size={48} className="text-stone-300 mb-4" />
+                               <p className="text-stone-600 font-black text-lg mb-2">設定 Google Looker Studio 報表</p>
+                               <p className="text-stone-400 text-xs font-bold mb-6 max-w-md leading-relaxed">
+                                  請前往 Looker Studio 建立 GA4 報表，取得「嵌入報表」的網址，貼在下方即可直接在後台查看流量圖表。
+                               </p>
+                               <div className="w-full max-w-lg flex flex-col sm:flex-row gap-3">
+                                   <input 
+                                     type="text" 
+                                     value={tempLookerUrl} 
+                                     onChange={e => setTempLookerUrl(e.target.value)} 
+                                     placeholder="https://lookerstudio.google.com/embed/reporting/..." 
+                                     className="flex-1 p-3 bg-stone-50 border-2 border-stone-100 rounded-xl font-bold text-sm outline-none focus:border-orange-500 transition-colors text-center sm:text-left" 
+                                   />
+                                   <button onClick={handleSaveLookerUrl} className="bg-orange-500 text-white px-6 py-3 rounded-xl font-black text-sm hover:bg-orange-600 transition-colors shadow-md">儲存顯示</button>
+                               </div>
+                               {lookerUrl && <button onClick={() => { setIsEditingLooker(false); setTempLookerUrl(lookerUrl); }} className="mt-4 text-xs text-stone-400 font-bold hover:text-stone-600">取消編輯</button>}
+                           </div>
+                        ) : (
+                           <div className="flex-1 rounded-2xl overflow-hidden border border-stone-200 bg-white w-full h-full relative z-10">
+                              <iframe 
+                                width="100%" 
+                                height="100%" 
+                                src={lookerUrl} 
+                                frameBorder="0" 
+                                style={{ border: 0, minHeight: '400px' }} 
+                                allowFullScreen 
+                                sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+                              ></iframe>
+                           </div>
+                        )}
+                        <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ background: 'repeating-linear-gradient(45deg, transparent, transparent 10px, #ED7D31 10px, #ED7D31 20px)' }}></div>
                       </div>
                     </div>
                   </div>
@@ -492,24 +517,26 @@
                 {adminTab === 'gallery' && (
                   <div className="q-card p-8 md:p-12 animate-page">
                     <h3 className="text-2xl font-black text-gray-800 mb-8 flex items-center gap-3 border-b-2 border-orange-50 pb-4">
-                      <ImageIcon size={28} className="text-orange-500 bg-orange-50 rounded-full p-1"/> 網站照片管理 (預覽與發佈)
+                      <ImageIcon size={28} className="text-orange-500 bg-orange-50 rounded-full p-1"/> 照片管理與發佈
                     </h3>
                     
-                    {/* 隱藏的檔案輸入框 */}
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      className="hidden" 
-                      ref={fileInputRef} 
-                      onChange={handleFileChange} 
-                    />
-
-                    <div onClick={handleUploadPhotoClick} className="border-4 border-dashed border-stone-200 rounded-[40px] p-12 text-center group hover:border-orange-300 hover:bg-orange-50/30 transition-all cursor-pointer mb-12">
-                       <div className="bg-orange-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-orange-400 group-hover:scale-110 group-hover:bg-orange-100 transition-transform">
-                         <Plus size={32}/>
+                    <div className="bg-orange-50 border-2 border-dashed border-orange-200 rounded-[40px] p-10 text-center mb-12">
+                       <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-orange-500 shadow-md">
+                         <Cloud size={32}/>
                        </div>
-                       <p className="font-black text-stone-500 text-lg">1. 點擊上傳新照片 (進入後台預覽)</p>
-                       <p className="text-xs text-stone-400 mt-2 font-bold">上傳後狀態為「未發佈」，請點擊編輯添加分類與註解，並手動發佈。</p>
+                       <p className="font-black text-stone-700 text-lg mb-2">步驟 1：將照片上傳至 Google 雲端資料夾</p>
+                       <p className="text-xs text-stone-500 font-bold mb-6 max-w-md mx-auto leading-relaxed">
+                         上傳完成後，點擊下方按鈕將照片同步至網站。新照片會預設為<span className="text-orange-600 font-black">「草稿 (未發佈)」</span>狀態。<br/>請編輯分類與註解後再發佈至前台。
+                       </p>
+                       
+                       <button 
+                         onClick={() => syncDrivePhotos(true)}
+                         disabled={isPhotoLoading}
+                         className="bg-orange-500 text-white px-8 py-4 rounded-full font-black text-sm shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3 mx-auto disabled:opacity-50 disabled:hover:scale-100"
+                       >
+                         {isPhotoLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <Cloud size={20}/>}
+                         {isPhotoLoading ? '同步雲端資料中...' : '同步雲端照片至後台'}
+                       </button>
                     </div>
 
                     <h4 className="text-lg font-black text-gray-800 mb-6 flex items-center gap-2">
@@ -518,39 +545,45 @@
                        {isPhotoLoading && <span className="text-sm text-orange-500 ml-4 animate-pulse">正在同步雲端...</span>}
                     </h4>
 
-                    {isPhotoLoading ? (
+                    {isPhotoLoading && photoData.length === 0 ? (
                       <div className="flex justify-center items-center py-20">
                          <div className="w-10 h-10 border-4 border-orange-100 border-t-orange-500 rounded-full animate-spin"></div>
                       </div>
                     ) : photoData.length === 0 ? (
                       <div className="bg-stone-50 border-2 border-dashed border-stone-200 rounded-3xl py-16 text-center text-stone-400 font-bold">
-                        目前圖庫為空，請上傳照片。
+                        目前圖庫為空，請點擊上方按鈕從雲端同步。
                       </div>
                     ) : (
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                          {photoData.map(photo => (
                            <div key={photo.id} className={`aspect-square bg-stone-100 rounded-2xl overflow-hidden relative group border-4 transition-colors ${photo.isPublished ? 'border-green-400 shadow-md' : 'border-stone-200 opacity-80'}`}>
-                              <img src={photo.url} alt={photo.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
+                              <img 
+                                src={getValidImageUrl(photo.url)} 
+                                alt={photo.title} 
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                                loading="lazy" 
+                                onError={(e) => { e.target.src = 'https://placehold.co/800x800/eeeeee/999999?text=Image+Error'; }}
+                              />
                               
                               {/* 發佈狀態標籤 */}
                               <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
                                 {photo.isPublished ? (
                                   <span className="bg-green-500 text-white px-2 py-1 rounded-lg text-[10px] font-black shadow-md flex items-center gap-1"><CheckCircle size={12}/> 前台展示中</span>
                                 ) : (
-                                  <span className="bg-stone-600 text-white px-2 py-1 rounded-lg text-[10px] font-black shadow-md flex items-center gap-1">待發佈 (僅預覽)</span>
+                                  <span className="bg-stone-600 text-white px-2 py-1 rounded-lg text-[10px] font-black shadow-md flex items-center gap-1">待發佈 (草稿)</span>
                                 )}
                                 <span className="bg-orange-500 text-white px-2 py-1 rounded-lg text-[10px] font-black shadow-md w-fit">{photo.category || '未分類'}</span>
                               </div>
 
                               {/* 懸停操作選單 */}
                               <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-3 z-20">
-                                 <button onClick={() => setEditingPhoto(photo)} className="bg-white text-stone-800 px-4 py-2 rounded-full font-black text-xs hover:bg-stone-200 transition-colors w-28 flex items-center justify-center gap-1">
+                                 <button onClick={() => setEditingPhoto(photo)} className="bg-white text-stone-800 px-4 py-2 rounded-full font-black text-xs hover:bg-stone-200 transition-colors w-28 flex items-center justify-center gap-1 shadow-md">
                                    <Edit3 size={14}/> 編輯資訊
                                  </button>
-                                 <button onClick={() => togglePublishPhoto(photo.id)} className={`px-4 py-2 rounded-full font-black text-xs transition-colors w-28 text-center ${photo.isPublished ? 'bg-stone-600 text-white hover:bg-stone-500' : 'bg-orange-500 text-white hover:bg-orange-600'}`}>
+                                 <button onClick={() => togglePublishPhoto(photo.id)} className={`px-4 py-2 rounded-full font-black text-xs transition-colors w-28 text-center shadow-md ${photo.isPublished ? 'bg-stone-600 text-white hover:bg-stone-500' : 'bg-orange-500 text-white hover:bg-orange-600'}`}>
                                    {photo.isPublished ? '取消發佈' : '發佈至前台'}
                                  </button>
-                                 <button onClick={() => handleDeletePhoto(photo.id)} className="bg-red-500 text-white px-4 py-2 rounded-full font-black text-xs hover:bg-red-600 transition-colors w-28 flex items-center justify-center gap-1">
+                                 <button onClick={() => handleDeletePhoto(photo.id)} className="bg-red-500 text-white px-4 py-2 rounded-full font-black text-xs hover:bg-red-600 transition-colors w-28 flex items-center justify-center gap-1 shadow-md">
                                    <Trash2 size={14}/> 刪除
                                  </button>
                               </div>
@@ -573,7 +606,11 @@
                   </div>
                   
                   <div className="mb-6 rounded-2xl overflow-hidden bg-stone-100 aspect-video relative">
-                     <img src={editingPhoto.url} className="w-full h-full object-cover" />
+                     <img 
+                       src={getValidImageUrl(editingPhoto.url)} 
+                       className="w-full h-full object-cover" 
+                       onError={(e) => { e.target.src = 'https://placehold.co/800x800/eeeeee/999999?text=Image+Error'; }}
+                     />
                   </div>
 
                   <form onSubmit={handleSavePhotoEdit} className="space-y-5">
@@ -637,17 +674,114 @@
 
     // --- 子頁面組件 ---
 
-    const HomePage = ({ onNavigate, newsData, photoData, isPhotoLoading }) => {
-      const [activeCategory, setActiveCategory] = useState('全部');
+    // 💡 新增：單獨相簿分類頁面組件
+    const AlbumPage = ({ category, photoData, onBack }) => {
       const [lightboxPhoto, setLightboxPhoto] = useState(null);
+      const displayPhotos = photoData.filter(p => p.isPublished && p.category === category);
 
-      // 過濾發佈且符合分類的照片
-      const displayPhotos = photoData.filter(p => {
-        if (!p.isPublished) return false;
-        if (activeCategory === '全部') return true;
-        return (p.category || '未分類') === activeCategory;
-      });
+      useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, []);
 
+      return (
+        <div className="pt-32 pb-24 px-6 min-h-screen bg-stone-50 animate-page">
+          <div className="max-w-6xl mx-auto">
+             <button onClick={onBack} className="mb-8 text-stone-500 hover:text-orange-500 font-black flex items-center gap-2 transition-colors">
+               <ChevronRight className="rotate-180" size={20}/> 返回花絮總覽
+             </button>
+             
+             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b-4 border-stone-200 pb-8">
+               <div className="flex items-center gap-4">
+                 <div className="bg-orange-100 p-4 rounded-2xl text-orange-600"><ImageIcon size={40}/></div>
+                 <div>
+                   <span className="text-orange-500 font-black text-sm tracking-widest uppercase mb-1 block">Nuan Nuan Gallery</span>
+                   <h2 className="text-4xl font-black text-gray-800 tracking-tight">{category}</h2>
+                 </div>
+               </div>
+               <div className="bg-white px-6 py-3 rounded-full shadow-sm border-2 border-stone-100">
+                 <span className="font-black text-stone-500">共 {displayPhotos.length} 張紀錄</span>
+               </div>
+             </div>
+
+             {displayPhotos.length === 0 ? (
+               <div className="text-center py-24 bg-white rounded-[45px] border-4 border-dashed border-stone-100 shadow-sm">
+                 <ImageIcon size={48} className="mx-auto text-stone-300 mb-4"/>
+                 <h3 className="text-xl font-black text-stone-500 mb-2">相簿目前是空的</h3>
+                 <p className="text-stone-400 font-bold">目前「{category}」還沒有發佈照片喔！</p>
+               </div>
+             ) : (
+               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {displayPhotos.map((item, idx) => (
+                    <div 
+                      key={item.id} 
+                      onClick={() => setLightboxPhoto(item)}
+                      className="group relative overflow-hidden rounded-[35px] aspect-[4/5] shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer bg-stone-200 animate-zoom-in"
+                      style={{ animationDelay: `${idx * 50}ms` }}
+                    >
+                       <img 
+                         src={getValidImageUrl(item.url)} 
+                         alt={item.title} 
+                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                         loading="lazy" 
+                         onError={(e) => { e.target.src = 'https://placehold.co/800x800/eeeeee/999999?text=Image+Error'; }}
+                       />
+                       <div className="absolute inset-0 gallery-overlay opacity-80 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8 text-white text-center">
+                          <h4 className="text-2xl font-black tracking-tight mb-2">{item.title}</h4>
+                          <p className="text-sm font-bold text-stone-300 line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                            {item.description || '點擊查看詳細資訊'}
+                          </p>
+                       </div>
+                    </div>
+                  ))}
+               </div>
+             )}
+          </div>
+
+          {/* Lightbox */}
+          {lightboxPhoto && (
+            <div 
+              className="fixed inset-0 z-[400] bg-black/95 flex items-center justify-center p-4 md:p-10 animate-page"
+              onClick={() => setLightboxPhoto(null)}
+            >
+              <button 
+                className="absolute top-6 right-6 md:top-10 md:right-10 text-stone-400 hover:text-white transition-colors bg-stone-800/50 p-2 rounded-full"
+                onClick={() => setLightboxPhoto(null)}
+              >
+                <X size={36}/>
+              </button>
+              
+              <div 
+                className="max-w-6xl w-full flex flex-col md:flex-row gap-6 md:gap-10 items-center justify-center max-h-full"
+                onClick={(e) => e.stopPropagation()}
+              >
+                 <div className="flex-1 w-full max-h-[60vh] md:max-h-[85vh] flex justify-center">
+                   <img 
+                     src={getValidImageUrl(lightboxPhoto.url)} 
+                     alt={lightboxPhoto.title} 
+                     className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl border-4 border-stone-800 bg-stone-900"
+                     onError={(e) => { e.target.src = 'https://placehold.co/800x800/eeeeee/999999?text=Image+Error'; }}
+                   />
+                 </div>
+                 
+                 <div className="w-full md:w-80 lg:w-96 shrink-0 bg-stone-900 border border-stone-800 p-8 rounded-[40px] text-white shadow-2xl">
+                    <div className="flex items-center gap-3 mb-6 pb-6 border-b border-stone-800">
+                       <span className="bg-orange-500/20 text-orange-400 text-xs px-3 py-1.5 rounded-full font-black border border-orange-500/30">
+                         {lightboxPhoto.category || '未分類'}
+                       </span>
+                    </div>
+                    <h4 className="text-3xl font-black mb-6 leading-tight tracking-tight">{lightboxPhoto.title}</h4>
+                    <div className="text-stone-300 font-bold leading-loose whitespace-pre-wrap max-h-[30vh] overflow-y-auto custom-scrollbar pr-2">
+                       {lightboxPhoto.description || '這是一張充滿溫度的暖暖日常紀錄，感謝每一個相伴的時刻。'}
+                    </div>
+                 </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    const HomePage = ({ onNavigate, onNavigateAlbum, newsData, photoData, isPhotoLoading }) => {
       return (
         <div className="animate-page pb-24">
           <section className="relative min-h-[75vh] flex items-center px-6 overflow-hidden hero-gradient py-20">
@@ -740,118 +874,49 @@
             </div>
           </section>
 
+          {/* 💡 修改為三大相簿資料夾入口 */}
           <section className="px-6 mt-20 md:mt-32">
             <div className="max-w-6xl mx-auto">
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-                 <div className="flex items-center gap-4">
-                   <div className="bg-orange-100 p-3 rounded-xl text-orange-600"><ImageIcon size={32}/></div>
-                   <h3 className="text-3xl font-black text-gray-800 tracking-tight">暖暖花絮</h3>
-                 </div>
-                 
-                 {/* 照片分類篩選按鈕 */}
-                 <div className="flex gap-2 flex-wrap bg-white p-2 rounded-full border-2 border-stone-100 shadow-sm">
-                    {['全部', ...PHOTO_CATEGORIES].map(cat => (
-                       <button 
-                         key={cat}
-                         onClick={() => setActiveCategory(cat)}
-                         className={`px-5 py-2 rounded-full font-black text-sm transition-all duration-300 ${activeCategory === cat ? 'bg-orange-500 text-white shadow-md' : 'text-stone-500 hover:bg-orange-50'}`}
-                       >
-                         {cat}
-                       </button>
-                    ))}
-                 </div>
+              <div className="flex items-center gap-4 mb-12">
+                 <div className="bg-orange-100 p-3 rounded-xl text-orange-600"><ImageIcon size={32}/></div>
+                 <h3 className="text-3xl font-black text-gray-800 tracking-tight">暖暖花絮</h3>
               </div>
 
-              {/* 加入從 Google Drive 讀取的載入狀態 */}
-              {isPhotoLoading ? (
-                <div className="text-center py-24 bg-[#FFF9F2] rounded-[45px] border-4 border-orange-100">
-                   <div className="w-12 h-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mx-auto mb-6"></div>
-                   <p className="text-orange-600 font-black text-lg tracking-widest animate-pulse">正在同步 Google 雲端硬碟照片...</p>
-                   <p className="text-stone-400 font-bold text-sm mt-2">Connecting to Google Drive</p>
-                </div>
-              ) : displayPhotos.length === 0 ? (
-                 <div className="text-center py-20 bg-stone-50 rounded-[45px] text-stone-400 font-bold border-2 border-stone-100 border-dashed">
-                   這個分類目前尚未發佈照片。
-                 </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {displayPhotos.map((item, idx) => (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {PHOTO_CATEGORIES.map((cat, idx) => {
+                  const catPhotos = photoData.filter(p => p.isPublished && p.category === cat);
+                  const coverUrl = catPhotos.length > 0 
+                     ? getValidImageUrl(catPhotos[0].url) 
+                     : 'https://images.unsplash.com/photo-1493836512294-502baa1986e2?auto=format&fit=crop&w=800&q=80';
+
+                  return (
                     <div 
-                      key={item.id} 
-                      onClick={() => setLightboxPhoto(item)}
-                      className="group relative overflow-hidden rounded-[35px] aspect-[4/5] shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer bg-stone-200 animate-zoom-in"
-                      style={{ animationDelay: `${idx * 50}ms` }}
+                      key={cat}
+                      onClick={() => onNavigateAlbum(cat)}
+                      className="group relative overflow-hidden rounded-[40px] aspect-square shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer bg-stone-200 animate-zoom-in"
+                      style={{ animationDelay: `${idx * 150}ms` }}
                     >
                       <img 
-                        src={item.url} 
-                        alt={item.title} 
+                        src={coverUrl} 
+                        alt={cat} 
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                         loading="lazy"
+                        onError={(e) => { e.target.src = 'https://placehold.co/800x800/eeeeee/999999?text=Image+Error'; }}
                       />
-                      <div className="absolute inset-0 gallery-overlay opacity-80 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8 text-white text-center">
-                        <span className="text-[10px] font-black text-orange-400 mb-3 uppercase tracking-widest bg-black/50 px-3 py-1.5 rounded-full w-fit mx-auto backdrop-blur-md">
-                          {item.category || '未分類'}
-                        </span>
-                        <h4 className="text-2xl font-black tracking-tight mb-2">{item.title}</h4>
-                        <p className="text-sm font-bold text-stone-300 line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                          {item.description || '點擊查看詳細資訊'}
-                        </p>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8 text-white">
+                        <div className="bg-orange-500/80 backdrop-blur-sm w-fit px-4 py-1.5 rounded-full mb-3 shadow-md border border-white/20 flex items-center gap-2">
+                          <ImageIcon size={14}/>
+                          <span className="text-xs font-black tracking-widest">{catPhotos.length} 張紀錄</span>
+                        </div>
+                        <h4 className="text-3xl font-black tracking-tight mb-1">{cat}</h4>
+                        <p className="text-stone-300 font-bold text-sm group-hover:text-white transition-colors">點擊進入專屬相簿查看更多</p>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-              
-              <div className="mt-12 text-center">
-                 <button onClick={() => onNavigate('social')} className="inline-flex items-center gap-3 text-orange-500 font-black text-sm hover:gap-5 transition-all">
-                    前往社群查看更多動態 <ChevronRight size={18}/>
-                 </button>
+                  );
+                })}
               </div>
             </div>
           </section>
-
-          {/* 照片 Lightbox 燈箱展示 */}
-          {lightboxPhoto && (
-            <div 
-              className="fixed inset-0 z-[400] bg-black/95 flex items-center justify-center p-4 md:p-10 animate-page"
-              onClick={() => setLightboxPhoto(null)} // 點擊背景關閉
-            >
-              <button 
-                className="absolute top-6 right-6 md:top-10 md:right-10 text-stone-400 hover:text-white transition-colors bg-stone-800/50 p-2 rounded-full"
-                onClick={() => setLightboxPhoto(null)}
-              >
-                <X size={36}/>
-              </button>
-              
-              <div 
-                className="max-w-6xl w-full flex flex-col md:flex-row gap-6 md:gap-10 items-center justify-center max-h-full"
-                onClick={(e) => e.stopPropagation()} // 阻止事件冒泡，點擊內容區不會關閉
-              >
-                 {/* 左側大圖 */}
-                 <div className="flex-1 w-full max-h-[60vh] md:max-h-[85vh] flex justify-center">
-                   <img 
-                     src={lightboxPhoto.url} 
-                     alt={lightboxPhoto.title} 
-                     className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl border-4 border-stone-800"
-                   />
-                 </div>
-                 
-                 {/* 右側資訊 (註解) */}
-                 <div className="w-full md:w-80 lg:w-96 shrink-0 bg-stone-900 border border-stone-800 p-8 rounded-[40px] text-white shadow-2xl">
-                    <div className="flex items-center gap-3 mb-6 pb-6 border-b border-stone-800">
-                       <span className="bg-orange-500/20 text-orange-400 text-xs px-3 py-1.5 rounded-full font-black border border-orange-500/30">
-                         {lightboxPhoto.category || '未分類'}
-                       </span>
-                    </div>
-                    <h4 className="text-3xl font-black mb-6 leading-tight tracking-tight">{lightboxPhoto.title}</h4>
-                    <div className="text-stone-300 font-bold leading-loose whitespace-pre-wrap max-h-[30vh] overflow-y-auto custom-scrollbar pr-2">
-                       {lightboxPhoto.description || '這是一張充滿溫度的暖暖日常紀錄，感謝每一個相伴的時刻。'}
-                    </div>
-                 </div>
-              </div>
-            </div>
-          )}
-
         </div>
       );
     }
@@ -1223,14 +1288,30 @@
     // --- 主程式 App ---
     const App = () => {
       const [currentPage, setCurrentPage] = useState('home');
+      const [selectedAlbum, setSelectedAlbum] = useState(null); // 💡 新增：紀錄當前點選的相簿分類
+
       const [isAdmin, setIsAdmin] = useState(false);
+      const [isPhotoLoading, setIsPhotoLoading] = useState(false);
       
-      const [newsData, setNewsData] = useState(initialNewsList);
-      // ==========================================
-      // 💡 照片資料與載入狀態設定
-      // ==========================================
-      const [photoData, setPhotoData] = useState([]);
-      const [isPhotoLoading, setIsPhotoLoading] = useState(true);
+      const [newsData, setNewsData] = useState(() => {
+        const saved = localStorage.getItem('nuannuan_news_db');
+        return saved ? JSON.parse(saved) : initialNewsList;
+      });
+
+      const updateNewsData = (newData) => {
+        setNewsData(newData);
+        localStorage.setItem('nuannuan_news_db', JSON.stringify(newData));
+      };
+
+      const [photoData, setPhotoData] = useState(() => {
+        const saved = localStorage.getItem('nuannuan_photos_db');
+        return saved ? JSON.parse(saved) : initialPhotoList;
+      });
+
+      const updatePhotoData = (newData) => {
+        setPhotoData(newData);
+        localStorage.setItem('nuannuan_photos_db', JSON.stringify(newData));
+      };
 
       const [isMenuOpen, setIsMenuOpen] = useState(false);
       const [scrolled, setScrolled] = useState(false);
@@ -1244,7 +1325,6 @@
       const [identity, setIdentity] = useState('16');
       const [quantities, setQuantities] = useState({});
 
-      // 💡 當使用者切換頁面時，主動發送 GA4 Page View 事件 (解決 SPA 單頁應用程式問題)
       useEffect(() => {
         if (typeof window.gtag === 'function') {
           window.gtag('event', 'page_view', {
@@ -1252,43 +1332,76 @@
             page_path: `/${currentPage}`
           });
         }
-        window.scrollTo({ top: 0, behavior: 'smooth' });
       }, [currentPage]);
 
       // ==========================================
-      // 💡 一進入網站，立刻向 Google Apps Script 抓取照片
+      // 💡 雲端相片同步邏輯 (自動處理 Google Drive 網址轉換)
       // ==========================================
-      useEffect(() => {
-        const fetchDrivePhotos = async () => {
-          setIsPhotoLoading(true);
-          
-          // 如果還沒填寫 API 網址，就載入預設照片
-          if (!GAS_PHOTO_API_URL || GAS_PHOTO_API_URL.includes("在此處貼上")) {
-            setPhotoData(initialPhotoList);
+      const syncDrivePhotos = async (isManual = false) => {
+        setIsPhotoLoading(true);
+        if (!GAS_PHOTO_API_URL || GAS_PHOTO_API_URL.includes("在此處貼上")) {
+            if(isManual) alert('請先於程式碼設定 GAS_PHOTO_API_URL');
             setIsPhotoLoading(false);
             return;
-          }
-          
-          try {
+        }
+        try {
             const response = await fetch(GAS_PHOTO_API_URL);
-            const data = await response.json();
+            const driveData = await response.json();
             
-            // 如果抓到了資料且大於0筆，就顯示雲端的照片 (預設為已發佈)
-            if(data && data.length > 0) {
-              const publishedData = data.map(p => ({ ...p, isPublished: true }));
-              setPhotoData(publishedData);
-            } else {
-              setPhotoData([]); // 沒有照片則設為空
-            }
-          } catch (error) {
-            console.error('無法取得 Google Drive 照片:', error);
-            setPhotoData(initialPhotoList); // 失敗則使用預設照片
-          } finally {
-            setIsPhotoLoading(false);
-          }
-        };
+            if (driveData && driveData.length > 0) {
+                setPhotoData(prev => {
+                    const newData = [...prev];
+                    let changed = false;
+                    let newCount = 0;
+                    
+                    driveData.forEach(driveItem => {
+                        let imgUrl = driveItem.url;
+                        
+                        // 💡 自動解析 Google Drive 網址，轉為正確的圖片直連格式 (改用 lh3.googleusercontent 避開近期封鎖)
+                        if (imgUrl && imgUrl.includes('drive.google.com')) {
+                            const match = imgUrl.match(/[\/?&]id=([a-zA-Z0-9_-]+)/) || imgUrl.match(/file\/d\/([a-zA-Z0-9_-]+)/);
+                            if (match) {
+                                imgUrl = `https://lh3.googleusercontent.com/d/${match[1]}`;
+                            }
+                        }
 
-        fetchDrivePhotos();
+                        // 如果本機資料庫裡還沒有這張圖，才把它加進來
+                        if (!newData.find(p => p.url === imgUrl)) {
+                            newData.unshift({
+                                id: Date.now() + Math.random(),
+                                title: driveItem.title || driveItem.name || '雲端新照片',
+                                url: imgUrl,
+                                category: PHOTO_CATEGORIES[0], 
+                                description: '',
+                                isPublished: false 
+                            });
+                            changed = true;
+                            newCount++;
+                        }
+                    });
+                    
+                    if (changed) {
+                        localStorage.setItem('nuannuan_photos_db', JSON.stringify(newData));
+                        if(isManual) alert(`✅ 同步完成！共新增 ${newCount} 張照片至後台資料庫。\n\n請在下方列表中編輯分類與描述，確認無誤後再點擊「發佈至前台」。`);
+                        return newData;
+                    } else {
+                        if(isManual) alert('✅ 雲端資料夾目前沒有發現新的照片。');
+                        return prev;
+                    }
+                });
+            } else {
+                if(isManual) alert('雲端資料夾目前為空。');
+            }
+        } catch (error) {
+            console.error('取得照片失敗:', error);
+            if(isManual) alert('❌ 同步失敗，請檢查網路或 API 網址設定。');
+        } finally {
+            setIsPhotoLoading(false);
+        }
+      };
+
+      useEffect(() => {
+        syncDrivePhotos(false);
       }, []);
 
       useEffect(() => {
@@ -1311,10 +1424,10 @@
           const qty = parseInt(quantities[code]) || 0;
           for (let i = 0; i < qty; i++) {
             if (currentTotalCost + item.price <= subsidyLimit) {
-              totalCopay += Math.round(item.price * (identity === '0' ? rate : 0)); // 修正低收入自付額邏輯
+              totalCopay += Math.round(item.price * (identity === '0' ? 0 : rate)); 
             } else {
               const remainingSubsidy = Math.max(0, subsidyLimit - currentTotalCost);
-              totalCopay += (Math.round(remainingSubsidy * (identity === '0' ? rate : 0)) + (item.price - remainingSubsidy));
+              totalCopay += (Math.round(remainingSubsidy * (identity === '0' ? 0 : rate)) + (item.price - remainingSubsidy));
             }
             currentTotalCost += item.price;
           }
@@ -1327,15 +1440,20 @@
         setQuantities(prev => ({ ...prev, [code]: newQty }));
       };
 
-      // 管理相片發佈狀態
       const togglePublishPhoto = (id) => {
-        setPhotoData(photoData.map(p => 
-          p.id === id ? { ...p, isPublished: !p.isPublished } : p
-        ));
+        const newData = photoData.map(p => p.id === id ? { ...p, isPublished: !p.isPublished } : p);
+        updatePhotoData(newData);
       };
 
       const navigate = (page) => {
         setCurrentPage(page);
+        setIsMenuOpen(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      const navigateToAlbum = (category) => {
+        setSelectedAlbum(category);
+        setCurrentPage('album');
         setIsMenuOpen(false);
       };
 
@@ -1373,7 +1491,7 @@
                 </div>
               </div>
               <div className={`hidden lg:flex gap-10 xl:gap-14 items-center font-black text-sm uppercase tracking-widest`}>
-                <button onClick={() => navigate('home')} className={`hover:text-orange-500 ${currentPage==='home'?'text-orange-500 underline underline-offset-[16px] decoration-4':''}`}>首頁故事</button>
+                <button onClick={() => navigate('home')} className={`hover:text-orange-500 ${['home', 'album'].includes(currentPage)?'text-orange-500 underline underline-offset-[16px] decoration-4':''}`}>首頁故事</button>
                 <button onClick={() => navigate('info')} className={`hover:text-orange-500 ${currentPage==='info'?'text-orange-500 underline underline-offset-[16px] decoration-4':''}`}>服務與對象</button>
                 <button onClick={() => navigate('calc')} className={`hover:text-orange-500 ${currentPage==='calc'?'text-orange-500 underline underline-offset-[16px] decoration-4':''}`}>費用試算</button>
                 <button onClick={() => navigate('social')} className={`hover:text-orange-500 ${currentPage==='social'?'text-orange-500 underline underline-offset-[16px] decoration-4':''}`}>社群專區</button>
@@ -1407,7 +1525,8 @@
           </nav>
 
           <main className="flex-grow">
-            {currentPage === 'home' && <HomePage onNavigate={navigate} newsData={newsData} photoData={photoData} isPhotoLoading={isPhotoLoading} />}
+            {currentPage === 'home' && <HomePage onNavigate={navigate} onNavigateAlbum={navigateToAlbum} newsData={newsData} photoData={photoData} isPhotoLoading={isPhotoLoading} />}
+            {currentPage === 'album' && <AlbumPage category={selectedAlbum} photoData={photoData} onBack={() => navigate('home')} />}
             {currentPage === 'info' && <InfoPage onNavigate={navigate} />}
             {currentPage === 'calc' && <CalcPage level={level} setLevel={setLevel} identity={identity} setIdentity={setIdentity} quantities={quantities} handleQtyChange={handleQtyChange} calcResults={calcResults} />}
             {currentPage === 'social' && <SocialPage />}
@@ -1416,10 +1535,11 @@
             {currentPage === 'admin' && isAdmin && (
               <AdminPage 
                 newsData={newsData} 
-                setNewsData={setNewsData} 
+                setNewsData={updateNewsData} 
                 photoData={photoData} 
-                setPhotoData={setPhotoData}
+                setPhotoData={updatePhotoData}
                 isPhotoLoading={isPhotoLoading}
+                syncDrivePhotos={syncDrivePhotos}
                 togglePublishPhoto={togglePublishPhoto}
                 onLogout={() => { setIsAdmin(false); navigate('home'); }} 
               />
