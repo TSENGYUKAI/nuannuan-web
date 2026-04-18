@@ -24,13 +24,8 @@
   <meta property="og:type" content="website">
 
   <!-- 4. 瀏覽器分頁標籤與書籤 -->
-  <!-- 針對一般瀏覽器 (改用外部 CDN 實體網址，徹底解決 Safari 阻擋內建代碼的問題) -->
   <link rel="icon" type="image/svg+xml" href="https://api.iconify.design/lucide/sun.svg?color=%23ED7D31">
-  
-  <!-- Safari 標籤頁專用 (必須是純黑實體 SVG 網址，並由蘋果系統自行套用 color 的橘色) -->
   <link rel="mask-icon" href="https://api.iconify.design/lucide/sun.svg?color=black" color="#ED7D31">
-
-  <!-- iOS 主畫面圖示備案 -->
   <link rel="apple-touch-icon" href="https://api.iconify.design/lucide/sun.svg?color=%23ED7D31">
 
   <!-- 5. JSON-LD 結構化資料 -->
@@ -54,7 +49,7 @@
   }
   </script>
   
-  <!-- 載入外部資源 (Tailwind, React, Babel) -->
+  <!-- 載入外部資源 -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -91,12 +86,6 @@
     input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
 
-    .glass-nav {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-    }
-    
     .q-rounded { border-radius: 40px; }
     .q-card {
       background: white;
@@ -110,10 +99,8 @@
       background: radial-gradient(circle at 70% 30%, #FFF2E6 0%, #FFF9F2 100%);
     }
 
-    .step-number {
-      background: white;
-      border: 3px solid #ED7D31;
-      color: #ED7D31;
+    .gallery-overlay {
+      background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
     }
   </style>
 </head>
@@ -218,6 +205,13 @@
       { date: "2026.01.01", title: "115年度長照補助新制上路說明", desc: "配合政府政策更新，今年起失智症照顧對象年齡下修，新增急性後期整合照護計畫(PAC)收案對象，歡迎來電洽詢詳細資格。" }
     ];
 
+    // --- 活動照片圖庫 (更換了第一張連結) ---
+    const photoList = [
+      { title: "溫馨照顧陪伴", url: "https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?auto=format&fit=crop&w=800&q=80" },
+      { title: "專業團隊會議", url: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80" },
+      { title: "社區互動交流", url: "https://images.unsplash.com/photo-1573497620053-ea5300f94f21?auto=format&fit=crop&w=800&q=80" }
+    ];
+
     // --- SVG 圖示組件 ---
     const Sun = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="4" fill="currentColor" fillOpacity="0.1"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>;
     const Phone = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>;
@@ -232,6 +226,7 @@
     const Briefcase = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
     const Calendar = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>;
     const Newspaper = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>;
+    const Image = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>;
     const ShieldCheck = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>;
     const Lock = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
 
@@ -323,6 +318,37 @@
             </div>
           </div>
         </section>
+
+        {/* 首頁：活動花絮區塊 */}
+        <section className="px-6 mt-20 md:mt-32">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center gap-4 mb-12">
+               <div className="bg-orange-100 p-3 rounded-xl text-orange-600"><Image size={32}/></div>
+               <h3 className="text-3xl font-black text-gray-800 tracking-tight">暖暖花絮</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {photoList.map((item, idx) => (
+                <div key={idx} className="group relative overflow-hidden rounded-[35px] aspect-[4/5] shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer bg-stone-200">
+                  <img 
+                    src={item.url} 
+                    alt={item.title} 
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 gallery-overlay opacity-60 group-hover:opacity-90 transition-opacity duration-500 flex flex-col justify-end p-8 text-white text-center">
+                    <span className="text-[10px] font-black text-orange-400 mb-2 uppercase tracking-widest bg-black/40 px-3 py-1.5 rounded-full w-fit mx-auto">Warm Moments</span>
+                    <h4 className="text-2xl font-black tracking-tight">{item.title}</h4>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-12 text-center">
+               <button onClick={() => onNavigate('social')} className="inline-flex items-center gap-3 text-orange-500 font-black text-sm hover:gap-5 transition-all">
+                  查看更多精彩時刻 <ChevronRight size={18}/>
+               </button>
+            </div>
+          </div>
+        </section>
       </div>
     );
 
@@ -334,7 +360,6 @@
             <p className="text-stone-500 text-sm max-w-2xl mx-auto font-bold italic underline decoration-orange-300 decoration-4 underline-offset-8">給家屬最專業、詳盡的政策導引</p>
           </div>
 
-          {/* 申請資格對象 */}
           <div className="q-card p-10 md:p-12 mb-16 relative overflow-hidden bg-gray-900 text-white border-none shadow-orange-900/20">
              <div className="absolute top-0 right-0 p-8 opacity-10"><Sun size={150}/></div>
              <h3 className="text-2xl font-black mb-8 flex items-center gap-3 relative z-10 text-orange-400">符合資格之申請對象</h3>
@@ -358,7 +383,6 @@
           </div>
 
           <div className="space-y-16">
-            {/* Wallet 1 */}
             <div className="q-card overflow-hidden">
                <div className="bg-orange-500 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-4 transition-all">
                   <div>
@@ -381,7 +405,6 @@
                </div>
             </div>
 
-            {/* Wallet 2: 交通接送 */}
             <div className="q-card overflow-hidden">
                <div className="bg-stone-800 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-4">
                   <div>
@@ -395,7 +418,6 @@
                </div>
             </div>
 
-            {/* Wallet 3: 輔具與環境改善 */}
             <div className="q-card overflow-hidden">
                <div className="bg-orange-600 p-8 text-white flex flex-col md:flex-row justify-between items-center gap-4">
                   <div>
@@ -423,7 +445,6 @@
                </div>
             </div>
 
-            {/* Wallet 4: 喘息服務 */}
             <div className="q-card overflow-hidden">
                <div className="bg-[#FFF4ED] p-8 text-orange-600 border-b-4 border-orange-100 flex flex-col md:flex-row justify-between items-center gap-4">
                   <div>
@@ -484,10 +505,8 @@
                   </div>
                </div>
             </div>
-
           </div>
 
-          {/* 5 步驟流程 */}
           <div className="mt-24 text-center">
              <h3 className="text-3xl font-black text-gray-800 mb-16 underline decoration-orange-500/20 decoration-8 underline-offset-[-4px]">專業服務申請流程</h3>
              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 px-4">
@@ -527,7 +546,7 @@
             <div className="space-y-12">
                <div className="bg-orange-50 p-8 md:p-12 rounded-[50px] shadow-inner border-2 border-dashed border-orange-200 text-center">
                   <h4 className="text-xl font-black text-orange-600 mb-6 uppercase tracking-widest font-black">薪資待遇與同仁福利</h4>
-                  <p className="text-gray-700 leading-loose text-lg md:text-xl font-black italic font-black">
+                  <p className="text-gray-700 leading-loose text-lg md:text-xl font-black italic">
                     「提供完善的薪資及福利制度，包含績效獎金與員工酬勞…等，與同仁共同分享營運上的成果，也獎勵同仁在公司的辛勞及貢獻。」
                   </p>
                </div>
@@ -576,7 +595,7 @@
       <div className="pt-28 pb-24 px-6 bg-stone-100 min-h-screen animate-page">
         <div className="max-w-7xl mx-auto px-4">
           <div className="bg-white p-8 md:p-12 q-rounded q-card mb-12 text-center border-none relative overflow-hidden animate-card shadow-sm">
-              <h2 className="text-3xl font-black text-gray-800 uppercase tracking-tighter font-black">長照 3.0 費用試算</h2>
+              <h2 className="text-3xl font-black text-gray-800 uppercase tracking-tighter">長照 3.0 費用試算</h2>
               <Sun className="absolute -top-16 -right-16 text-orange-500 opacity-5 w-64 h-64 animate-sun" />
           </div>
 
@@ -635,10 +654,10 @@
                                   <div key={item.code} className={`p-4 md:p-6 flex items-center justify-between transition-all ${q > 0 ? 'bg-orange-50/60' : 'hover:bg-orange-50/10'}`}>
                                      <div className="flex-1 pr-2 text-left">
                                         <div className="flex items-center gap-2 mb-1">
-                                           <span className="text-[10px] font-black text-orange-400 uppercase tracking-tighter font-black">{item.code}</span>
-                                           <span className="text-sm md:text-lg font-black text-gray-800 font-black">{item.name}</span>
+                                           <span className="text-[10px] font-black text-orange-400 uppercase tracking-tighter">{item.code}</span>
+                                           <span className="text-sm md:text-lg font-black text-gray-800">{item.name}</span>
                                         </div>
-                                        <div className="text-[10px] md:text-xs text-stone-400 font-black font-black">定價 ${item.price} | 自付額 <span className="text-orange-600 font-black">${coPay}</span></div>
+                                        <div className="text-[10px] md:text-xs text-stone-400 font-black">定價 ${item.price} | 自付額 <span className="text-orange-600 font-black">${coPay}</span></div>
                                      </div>
                                      <div className="flex items-center gap-2 bg-white border border-stone-200 rounded-[25px] p-1.5 shadow-sm shrink-0">
                                         <button onClick={() => handleQtyChange(item.code, q - 1)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-stone-50 text-stone-400 font-black">-</button>
@@ -658,8 +677,8 @@
             <div className="lg:col-span-1 px-4 md:px-0 text-left">
               <div className="sticky top-32 space-y-8 animate-card delay-300">
                 <div className="bg-gray-900 rounded-[50px] p-10 text-white shadow-2xl relative overflow-hidden">
-                  <p className="text-sm font-black text-orange-400 mb-3 uppercase flex justify-between tracking-widest font-black">預估每月自付總額 <span className="text-white/30 font-bold">第 {level} 級</span></p>
-                  <h3 className="text-5xl md:text-6xl font-black mb-10 tracking-tighter font-black">${calcResults.totalCopay.toLocaleString()}</h3>
+                  <p className="text-sm font-black text-orange-400 mb-3 uppercase flex justify-between tracking-widest">預估每月自付總額 <span className="text-white/30 font-bold">第 {level} 級</span></p>
+                  <h3 className="text-5xl md:text-6xl font-black mb-10 tracking-tighter">${calcResults.totalCopay.toLocaleString()}</h3>
                   <div className="space-y-4 border-t border-white/10 pt-8 font-black text-xs">
                     <div className="flex justify-between font-black">
                       <span className="text-white/40 uppercase">已用額度 / 補助上限</span>
@@ -671,8 +690,8 @@
                   <Sun className="absolute -bottom-10 -right-10 text-white/5 w-48 h-48 animate-sun" />
                 </div>
                 <div className="bg-white p-8 md:p-10 q-rounded border-4 border-orange-50 text-center shadow-sm mx-auto">
-                   <p className="text-[11px] font-black text-stone-400 mb-8 italic leading-relaxed font-black">※ 金額由社工師預估，最終依督導員開立之計畫為準。</p>
-                   <a href="tel:0901071711" className="flex items-center justify-center gap-3 w-full bg-orange-500 text-white py-5 rounded-[25px] font-black text-lg shadow-xl hover:scale-105 transition-all font-black"><Phone size={22}/> 電話洽詢專員</a>
+                   <p className="text-[11px] font-black text-stone-400 mb-8 italic leading-relaxed">※ 金額由社工師預估，最終依督導員開立之計畫為準。</p>
+                   <a href="tel:0901071711" className="flex items-center justify-center gap-3 w-full bg-orange-500 text-white py-5 rounded-[25px] font-black text-lg shadow-xl hover:scale-105 transition-all"><Phone size={22}/> 電話洽詢專員</a>
                 </div>
               </div>
             </div>
@@ -681,7 +700,6 @@
       </div>
     );
 
-    // --- 獨立政策頁面組件 ---
     const PolicyPage = ({ title, icon, content }) => (
       <div className="pt-32 pb-24 px-6 bg-stone-50 min-h-screen animate-page text-left">
         <div className="max-w-4xl mx-auto q-card p-10 md:p-16 border-stone-100 shadow-sm bg-white">
@@ -716,7 +734,6 @@
         return () => window.removeEventListener('scroll', handleScroll);
       }, []);
 
-      // 新增：監聽頁面變更，確保每次切換頁面後，都能確實平滑捲動到最上方
       useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }, [currentPage]);
@@ -751,7 +768,6 @@
       const navigate = (page) => {
         setCurrentPage(page);
         setIsMenuOpen(false);
-        // 原本這裡的 window.scrollTo 可以保留，或交由上方的 useEffect 統一處理
       };
 
       return (
@@ -761,28 +777,28 @@
               <div className="flex items-center gap-3 md:gap-4 cursor-pointer group" onClick={() => navigate('home')}>
                 <div className="bg-orange-500 p-2.5 rounded-2xl text-white shadow-2xl animate-sun group-hover:rotate-12 transition duration-300"><Sun size={32} /></div>
                 <div className="flex flex-col text-left leading-tight">
-                  <span className="font-black text-[11px] sm:text-xs md:text-sm tracking-tighter text-gray-900 font-black leading-tight">{fullBrandName}</span>
-                  <span className="text-[9px] md:text-[10px] font-black text-orange-500 tracking-widest font-black uppercase">府授衛長字第1150109649號</span>
+                  <span className="font-black text-[11px] sm:text-xs md:text-sm tracking-tighter text-gray-900 leading-tight">{fullBrandName}</span>
+                  <span className="text-[9px] md:text-[10px] font-black text-orange-500 tracking-widest uppercase">府授衛長字第1150109649號</span>
                 </div>
               </div>
-              <div className={`hidden lg:flex gap-10 xl:gap-14 items-center font-black text-sm uppercase tracking-widest font-black`}>
+              <div className={`hidden lg:flex gap-10 xl:gap-14 items-center font-black text-sm uppercase tracking-widest`}>
                 <button onClick={() => navigate('home')} className={`hover:text-orange-500 ${currentPage==='home'?'text-orange-500 underline underline-offset-[16px] decoration-4':''}`}>首頁故事</button>
                 <button onClick={() => navigate('info')} className={`hover:text-orange-500 ${currentPage==='info'?'text-orange-500 underline underline-offset-[16px] decoration-4':''}`}>服務與對象</button>
                 <button onClick={() => navigate('calc')} className={`hover:text-orange-500 ${currentPage==='calc'?'text-orange-500 underline underline-offset-[16px] decoration-4':''}`}>費用試算</button>
                 <button onClick={() => navigate('social')} className={`hover:text-orange-500 ${currentPage==='social'?'text-orange-500 underline underline-offset-[16px] decoration-4':''}`}>社群專區</button>
                 <button onClick={() => navigate('recruit')} className={`hover:text-orange-500 ${currentPage==='recruit'?'text-orange-500 underline underline-offset-[16px] decoration-4':''}`}>人才招募</button>
-                <a href="tel:0901071711" className="bg-orange-500 text-white px-6 xl:px-8 py-3.5 rounded-full text-xs shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3 font-black shadow-orange-500/20"><Phone size={14}/> 聯繫督導</a>
+                <a href="tel:0901071711" className="bg-orange-500 text-white px-6 xl:px-8 py-3.5 rounded-full text-xs shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3 shadow-orange-500/20"><Phone size={14}/> 聯繫督導</a>
               </div>
               <button className="lg:hidden text-gray-800 p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}><Menu size={36} /></button>
             </div>
             {isMenuOpen && (
-              <div className="lg:hidden fixed inset-0 top-0 bg-white z-[200] p-10 md:p-12 flex flex-col gap-8 text-2xl font-black text-gray-800 animate-page font-black">
+              <div className="lg:hidden fixed inset-0 top-0 bg-white z-[200] p-10 md:p-12 flex flex-col gap-8 text-2xl font-black text-gray-800 animate-page">
                 <div className="flex justify-end mb-8 md:mb-12"><button onClick={()=>setIsMenuOpen(false)}><X size={48} className="text-stone-300"/></button></div>
-                <button onClick={() => navigate('home')} className="text-left border-b-4 border-stone-50 pb-6 md:pb-8 flex justify-between items-center font-black">首頁故事 <ChevronRight size={28}/></button>
-                <button onClick={() => navigate('info')} className="text-left border-b-4 border-stone-50 pb-6 md:pb-8 flex justify-between items-center font-black">服務項目 <ChevronRight size={28}/></button>
-                <button onClick={() => navigate('calc')} className="text-left border-b-4 border-stone-50 pb-6 md:pb-8 flex justify-between items-center font-black">費用試算 <ChevronRight size={28}/></button>
-                <button onClick={() => navigate('social')} className="text-left border-b-4 border-stone-50 pb-6 md:pb-8 flex justify-between items-center font-black">社群專區 <ChevronRight size={28}/></button>
-                <button onClick={() => navigate('recruit')} className="text-left border-b-4 border-stone-50 pb-6 md:pb-8 flex justify-between items-center font-black">人才招募 <ChevronRight size={28}/></button>
+                <button onClick={() => navigate('home')} className="text-left border-b-4 border-stone-50 pb-6 md:pb-8 flex justify-between items-center">首頁故事 <ChevronRight size={28}/></button>
+                <button onClick={() => navigate('info')} className="text-left border-b-4 border-stone-50 pb-6 md:pb-8 flex justify-between items-center">服務項目 <ChevronRight size={28}/></button>
+                <button onClick={() => navigate('calc')} className="text-left border-b-4 border-stone-50 pb-6 md:pb-8 flex justify-between items-center">費用試算 <ChevronRight size={28}/></button>
+                <button onClick={() => navigate('social')} className="text-left border-b-4 border-stone-50 pb-6 md:pb-8 flex justify-between items-center">社群專區 <ChevronRight size={28}/></button>
+                <button onClick={() => navigate('recruit')} className="text-left border-b-4 border-stone-50 pb-6 md:pb-8 flex justify-between items-center">人才招募 <ChevronRight size={28}/></button>
               </div>
             )}
           </nav>
@@ -796,51 +812,12 @@
             {currentPage === 'privacy' && <PolicyPage 
               title="隱私權保護政策" 
               icon={<Lock size={36} />}
-              content={`歡迎您造訪「暖暖居家長照機構官方網站」（以下簡稱本網站），為了讓您能夠安心的使用本網站的各項服務與資訊，特此向您說明本網站的隱私權保護政策，以保障您的權益，請您詳閱下列內容：
-
-一、隱私權保護政策的適用範圍
-隱私權保護政策內容，包括本網站如何處理在您使用網站服務時收集到的個人識別資料。隱私權保護政策不適用於本網站以外的相關連結網站，也不適用於非本網站所委託或參與管理的人員。
-
-二、個人資料的蒐集、處理及利用方式
-• 當您造訪本網站或使用本網站所提供之功能服務時，我們將視該服務功能性質，請您提供必要的個人資料，並在該特定目的範圍內處理及利用您的個人資料；非經您書面同意，本網站不會將個人資料用於其他用途。
-• 本網站在您使用線上試算、客服信箱、問卷調查等互動性功能時，會保留您所提供的姓名、電子郵件地址、聯絡方式及使用時間等。
-• 於一般瀏覽時，伺服器會自行記錄相關行徑，包括您使用連線設備的IP位址、使用時間、使用的瀏覽器、瀏覽及點選資料記錄等，做為我們增進網站服務的參考依據，此記錄為內部應用，決不對外公佈。
-
-三、資料之保護
-本網站主機均設有防火牆、防毒系統等相關的各項資訊安全設備及必要的安全防護措施，加以保護網站及您的個人資料採用嚴格的保護措施，只由經過授權的人員才能接觸您的個人資料，相關處理人員皆簽有保密合約，如有違反保密義務者，將受相關法律處分。
-
-四、網站對外的相關連結
-本網站的網頁提供其他網站的網路連結，您也可經由本網站所提供的連結，點選進入其他網站。但該連結網站不適用本網站的隱私權保護政策，您必須參考該連結網站中的隱私權保護政策。
-
-五、隱私權保護政策之修正
-本網站隱私權保護政策將因應需求隨時進行修正，修正後的條款將刊登於網站上。`} 
+              content={`歡迎您造訪「暖暖居家長照機構官方網站」（以下簡稱本網站），為了讓您能夠安心的使用本網站的各項服務與資訊，特此向您說明本網站的隱私權保護政策，以保障您的權益，請您詳閱下列內容：\n\n一、隱私權保護政策的適用範圍\n隱私權保護政策內容，包括本網站如何處理在您使用網站服務時收集到的個人識別資料。隱私權保護政策不適用於本網站以外的相關連結網站，也不適用於非本網站所委託或參與管理的人員。\n\n二、個人資料的蒐集、處理及利用方式\n• 當您造訪本網站或使用本網站所提供之功能服務時，我們將視該服務功能性質，請您提供必要的個人資料，並在該特定目的範圍內處理及利用您的個人資料；非經您書面同意，本網站不會將個人資料用於其他用途。\n• 本網站在您使用線上試算、客服信箱、問卷調查等互動性功能時，會保留您所提供的姓名、電子郵件地址、聯絡方式及使用時間等。\n• 於一般瀏覽時，伺服器會自行記錄相關行徑，包括您使用連線設備的IP位址、使用時間、使用的瀏覽器、瀏覽及點選資料記錄等，做為我們增進網站服務的參考依據，此記錄為內部應用，決不對外公佈。\n\n三、資料之保護\n本網站主機均設有防火牆、防毒系統等相關的各項資訊安全設備及必要的安全防護措施，加以保護網站及您的個人資料採用嚴格的保護措施，只由經過授權的人員才能接觸您的個人資料，相關處理人員皆簽有保密合約，如有違反保密義務者，將受相關法律處分。\n\n四、網站對外的相關連結\n本網站的網頁提供其他網站的網路連結，您也可經由本網站所提供的連結，點選進入其他網站。但該連結網站不適用本網站的隱私權保護政策，您必須參考該連結網站中的隱私權保護政策。\n\n五、隱私權保護政策之修正\n本網站隱私權保護政策將因應需求隨時進行修正，修正後的條款將刊登於網站上。`} 
             />}
             {currentPage === 'security' && <PolicyPage 
               title="資訊安全政策" 
               icon={<ShieldCheck size={36} />}
-              content={`為確保「暖暖居家長照機構」（以下簡稱本機構）所屬之資訊資產的機密性、完整性及可用性，以符合相關法規之要求，使其免於遭受內、外部的蓄意或意外之威脅，特訂定此資訊安全政策（以下簡稱本政策），供所有同仁及合作夥伴共同遵行。
-
-一、政策目標
-1. 確保本機構資訊系統及網路的正常運作。
-2. 防止未經授權的資料存取、修改或破壞。
-3. 確保個案及家屬個人資料之安全與隱密性。
-4. 建立資訊安全事件之通報與應變機制，降低資安事件所帶來之衝擊。
-
-二、適用範圍
-本政策適用於本機構全體員工、委外服務廠商、訪客及使用本機構資訊資源之相關人員，並涵蓋本機構所有之資訊資產，包含但不限於硬體設備、軟體系統、網路設備、資料庫及紙本機密文件。
-
-三、資訊安全管理措施
-1. 存取控制：針對資訊系統設定嚴格的權限控管機制，並定期審查權限之適切性。所有系統皆須採用強式密碼政策。
-2. 網路安全：建立防火牆、防毒軟體及入侵偵測等防護機制，防範外部網路攻擊及惡意軟體感染。
-3. 資料備份：定期執行系統及重要資料備份，並進行還原測試，確保資料之可用性。
-4. 實體安全：機房及重要資訊設備應具備適當之門禁管制、溫濕度控制及消防設施。
-5. 教育訓練：定期辦理資訊安全教育訓練，提升全體人員之資安意識與法規遵循觀念。
-
-四、資安事件處理
-如發生資訊安全事件（如資料外洩、系統遭駭客入侵、病毒感染等），應立即通報相關權責主管，並依循本機構之「資安事件應變處理程序」進行處置，以期在最短時間內恢復正常運作，並檢討改善措施，防止類似事件再次發生。
-
-五、政策審查與修訂
-本政策將依據相關法令規範、技術發展及業務需求之變更，每年至少進行一次審查與修訂，以確保資訊安全管理之有效性及適切性。`} 
+              content={`為確保「暖暖居家長照機構」（以下簡稱本機構）所屬之資訊資產的機密性、完整性及可用性，以符合相關法規之要求，使其免於遭受內、外部的蓄意或意外之威脅，特訂定此資訊安全政策（以下簡稱本政策），供所有同仁及合作夥伴共同遵行。\n\n一、政策目標\n1. 確保本機構資訊系統及網路的正常運作。\n2. 防止未經授權的資料存取、修改 or 破壞。\n3. 確保個案及家屬個人資料之安全與隱密性。\n4. 建立資訊安全事件之通報與應變機制，降低資安事件所帶來之衝擊。\n\n二、適用範圍\n本政策適用於本機構全體員工、委外服務廠商、訪客及使用本機構資訊資源之相關人員，並涵蓋本機構所有之資訊資產，包含但不限於硬體設備、軟體系統、網路設備、資料庫及紙本機密文件。\n\n三、資訊安全管理措施\n1. 存取控制：針對資訊系統設定嚴格的權限控管機制，並定期審查權限之適切性。所有系統皆須採用強式密碼政策。\n2. 網路安全：建立防火牆、防毒軟體及入侵偵測等防護機制，防範外部網路攻擊及惡意軟體感染。\n3. 資料備份：定期執行系統及重要資料備份，並進行還原測試，確保資料之可用性。\n4. 實體安全：機房及重要資訊設備應具備適當之門禁管制、溫濕度控制及消防設施。\n5. 教育訓練：定期辦理資訊安全教育訓練，提升全體人員之資安意識與法規遵循觀念。\n\n四、資安事件處理\n如發生資訊安全事件（如資料外洩、系統遭駭客入侵、病毒感染等），應立即通報相關權責主管，並依循本機構之「資安事件應變處理程序」進行處置，以期在最短時間內恢復正常運作，並檢討改善措施，防止類似事件再次發生。\n\n五、政策審查與修訂\n本政策將依據相關法令規範、技術發展及業務需求之變更，每年至少進行一次審查與修訂，以確保資訊安全管理之有效性及適切性。`} 
             />}
           </main>
 
@@ -889,9 +866,7 @@
             </div>
           </footer>
 
-          {/* 全裝置通用的浮動 LINE 聯絡按鈕 */}
           <div className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[150] flex flex-col items-end gap-3">
-            {/* 返回頂部按鈕 */}
             <button 
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} 
               className={`bg-white text-stone-500 w-12 h-12 md:w-14 md:h-14 rounded-full shadow-xl flex items-center justify-center border-2 border-stone-100 hover:scale-110 hover:text-orange-500 hover:border-orange-200 transition-all duration-300 active:scale-95 group ${showTopBtn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}
@@ -900,11 +875,9 @@
               <ChevronUp className="w-6 h-6 md:w-7 md:h-7 group-hover:-translate-y-1 transition-transform duration-300" />
             </button>
 
-            {/* 電腦版專屬提示小氣泡 */}
             <div className="hidden md:block bg-white text-green-600 px-5 py-3 rounded-[20px] shadow-2xl font-black text-sm border-2 border-green-100 animate-bounce relative">
               需要協助嗎？加入 LINE 諮詢 👋
             </div>
-            {/* 浮動按鈕 */}
             <a href={lineUrl} target="_blank" rel="noopener noreferrer" className="bg-green-500 text-white w-16 h-16 md:w-20 md:h-20 rounded-full shadow-[0_25px_50px_-12px_rgba(34,197,94,0.5)] flex items-center justify-center border-[4px] md:border-[6px] border-white hover:scale-110 transition-transform active:scale-95 shadow-2xl group">
               <MessageCircle className="w-8 h-8 md:w-10 md:h-10 animate-pulse group-hover:animate-none" />
             </a>
