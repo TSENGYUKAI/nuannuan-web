@@ -232,7 +232,9 @@
     const Briefcase = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
     const Calendar = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>;
     const Newspaper = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>;
-    
+    const ShieldCheck = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>;
+    const Lock = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
+
     // 社群圖示
     const Facebook = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>;
     const Instagram = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>;
@@ -680,6 +682,23 @@
       </div>
     );
 
+    // --- 獨立政策頁面組件 ---
+    const PolicyPage = ({ title, icon, content }) => (
+      <div className="pt-32 pb-24 px-6 bg-stone-50 min-h-screen animate-page text-left">
+        <div className="max-w-4xl mx-auto q-card p-10 md:p-16 border-stone-100 shadow-sm bg-white">
+          <div className="flex flex-col items-center text-center mb-10">
+            <div className="bg-orange-50 text-orange-500 w-20 h-20 rounded-full flex items-center justify-center mb-6">
+              {icon}
+            </div>
+            <h2 className="text-3xl font-black text-gray-800 tracking-tight">{title}</h2>
+          </div>
+          <div className="text-stone-600 space-y-6 leading-relaxed font-bold whitespace-pre-wrap border-t-2 border-orange-50 pt-10">
+            {content}
+          </div>
+        </div>
+      </div>
+    );
+
     const App = () => {
       const [currentPage, setCurrentPage] = useState('home');
       const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -770,6 +789,55 @@
             {currentPage === 'calc' && <CalcPage level={level} setLevel={setLevel} identity={identity} setIdentity={setIdentity} quantities={quantities} handleQtyChange={handleQtyChange} calcResults={calcResults} />}
             {currentPage === 'social' && <SocialPage />}
             {currentPage === 'recruit' && <RecruitPage />}
+            {currentPage === 'privacy' && <PolicyPage 
+              title="隱私權保護政策" 
+              icon={<Lock size={36} />}
+              content={`歡迎您造訪「暖暖居家長照機構官方網站」（以下簡稱本網站），為了讓您能夠安心的使用本網站的各項服務與資訊，特此向您說明本網站的隱私權保護政策，以保障您的權益，請您詳閱下列內容：
+
+一、隱私權保護政策的適用範圍
+隱私權保護政策內容，包括本網站如何處理在您使用網站服務時收集到的個人識別資料。隱私權保護政策不適用於本網站以外的相關連結網站，也不適用於非本網站所委託或參與管理的人員。
+
+二、個人資料的蒐集、處理及利用方式
+• 當您造訪本網站或使用本網站所提供之功能服務時，我們將視該服務功能性質，請您提供必要的個人資料，並在該特定目的範圍內處理及利用您的個人資料；非經您書面同意，本網站不會將個人資料用於其他用途。
+• 本網站在您使用線上試算、客服信箱、問卷調查等互動性功能時，會保留您所提供的姓名、電子郵件地址、聯絡方式及使用時間等。
+• 於一般瀏覽時，伺服器會自行記錄相關行徑，包括您使用連線設備的IP位址、使用時間、使用的瀏覽器、瀏覽及點選資料記錄等，做為我們增進網站服務的參考依據，此記錄為內部應用，決不對外公佈。
+
+三、資料之保護
+本網站主機均設有防火牆、防毒系統等相關的各項資訊安全設備及必要的安全防護措施，加以保護網站及您的個人資料採用嚴格的保護措施，只由經過授權的人員才能接觸您的個人資料，相關處理人員皆簽有保密合約，如有違反保密義務者，將受相關法律處分。
+
+四、網站對外的相關連結
+本網站的網頁提供其他網站的網路連結，您也可經由本網站所提供的連結，點選進入其他網站。但該連結網站不適用本網站的隱私權保護政策，您必須參考該連結網站中的隱私權保護政策。
+
+五、隱私權保護政策之修正
+本網站隱私權保護政策將因應需求隨時進行修正，修正後的條款將刊登於網站上。`} 
+            />}
+            {currentPage === 'security' && <PolicyPage 
+              title="資訊安全政策" 
+              icon={<ShieldCheck size={36} />}
+              content={`為確保「暖暖居家長照機構」（以下簡稱本機構）所屬之資訊資產的機密性、完整性及可用性，以符合相關法規之要求，使其免於遭受內、外部的蓄意或意外之威脅，特訂定此資訊安全政策（以下簡稱本政策），供所有同仁及合作夥伴共同遵行。
+
+一、政策目標
+1. 確保本機構資訊系統及網路的正常運作。
+2. 防止未經授權的資料存取、修改或破壞。
+3. 確保個案及家屬個人資料之安全與隱密性。
+4. 建立資訊安全事件之通報與應變機制，降低資安事件所帶來之衝擊。
+
+二、適用範圍
+本政策適用於本機構全體員工、委外服務廠商、訪客及使用本機構資訊資源之相關人員，並涵蓋本機構所有之資訊資產，包含但不限於硬體設備、軟體系統、網路設備、資料庫及紙本機密文件。
+
+三、資訊安全管理措施
+1. 存取控制：針對資訊系統設定嚴格的權限控管機制，並定期審查權限之適切性。所有系統皆須採用強式密碼政策。
+2. 網路安全：建立防火牆、防毒軟體及入侵偵測等防護機制，防範外部網路攻擊及惡意軟體感染。
+3. 資料備份：定期執行系統及重要資料備份，並進行還原測試，確保資料之可用性。
+4. 實體安全：機房及重要資訊設備應具備適當之門禁管制、溫濕度控制及消防設施。
+5. 教育訓練：定期辦理資訊安全教育訓練，提升全體人員之資安意識與法規遵循觀念。
+
+四、資安事件處理
+如發生資訊安全事件（如資料外洩、系統遭駭客入侵、病毒感染等），應立即通報相關權責主管，並依循本機構之「資安事件應變處理程序」進行處置，以期在最短時間內恢復正常運作，並檢討改善措施，防止類似事件再次發生。
+
+五、政策審查與修訂
+本政策將依據相關法令規範、技術發展及業務需求之變更，每年至少進行一次審查與修訂，以確保資訊安全管理之有效性及適切性。`} 
+            />}
           </main>
 
           <footer className="bg-stone-900 text-white py-24 px-10 mt-auto border-t-[12px] border-orange-500">
@@ -782,8 +850,9 @@
                 <p className="text-stone-400 text-lg md:text-xl leading-relaxed max-w-xl mb-12 font-black italic font-black">
                    在大城鄉的每一個朝陽升起之際，我們始終守候。我們連結社區資源，讓長輩享有高品質的居家生活。
                 </p>
-                <div className="inline-block bg-stone-800 text-stone-300 px-10 py-5 rounded-[35px] text-xs font-mono border border-stone-700 font-black tracking-widest font-black">
-                  立案字號：府授衛長字第1150109649號
+                <div className="inline-block bg-stone-800 text-stone-300 px-8 py-5 rounded-[30px] text-xs font-mono border border-stone-700 font-black tracking-widest leading-relaxed">
+                  <div className="mb-1">立案字號：府授衛長字第1150109649號</div>
+                  <div>統一編號：61005869</div>
                 </div>
               </div>
               <div className="space-y-16">
@@ -804,8 +873,15 @@
                 </div>
               </div>
             </div>
-            <div className="max-w-[1400px] mx-auto mt-32 pt-12 border-t border-white/5 text-[11px] text-stone-600 uppercase tracking-[0.6em] font-black text-center md:text-left opacity-30">
-              © 2026 NUAN NUAN HOME CARE. ALL RIGHTS RESERVED.
+            
+            <div className="max-w-[1400px] mx-auto mt-32 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+              <div className="flex flex-wrap justify-center md:justify-start gap-6 text-[12px] text-stone-400 font-black tracking-widest order-2 md:order-1">
+                <button onClick={() => navigate('privacy')} className="hover:text-orange-400 transition-colors underline underline-offset-4 decoration-stone-700 hover:decoration-orange-400">隱私權保護政策</button>
+                <button onClick={() => navigate('security')} className="hover:text-orange-400 transition-colors underline underline-offset-4 decoration-stone-700 hover:decoration-orange-400">資訊安全政策</button>
+              </div>
+              <div className="text-[11px] text-stone-600 uppercase tracking-[0.6em] font-black text-center md:text-right opacity-30 order-1 md:order-2">
+                © 2026 NUAN NUAN HOME CARE. ALL RIGHTS RESERVED.
+              </div>
             </div>
           </footer>
 
