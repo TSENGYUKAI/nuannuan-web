@@ -24,6 +24,15 @@
   <link rel="mask-icon" href="https://api.iconify.design/lucide/sun.svg?color=black" color="#ED7D31">
   <link rel="apple-touch-icon" href="https://api.iconify.design/lucide/sun.svg?color=%23ED7D31">
 
+  <!-- Google Analytics 4 追蹤代碼 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-N4JQ7VRLTR"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-N4JQ7VRLTR');
+  </script>
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -125,7 +134,12 @@
   </div>
 
   <script type="text/babel">
-    const { useState, useEffect, useMemo } = React;
+    const { useState, useEffect, useMemo, useRef } = React;
+    
+    // ==========================================
+    // 💡 串接設定區 (在這裡填入您的 Apps Script 網址)
+    // ==========================================
+    const GAS_PHOTO_API_URL = "https://script.google.com/macros/s/AKfycbwG2HthS6svaJGiM9PLVQlYFJRXgWyBQhQNGLH6hJxkkfKeTKLMzY902zi1JegwsthjWw/exec"; 
     
     // --- 靜態資料定義 ---
     const fullBrandName = "暖暖有限公司附設彰化縣私立暖暖居家長照機構";
@@ -210,16 +224,16 @@
 
     const allServiceItems = serviceCategories.flatMap(c => c.items);
 
-    // --- 初始的最新消息與活動照片資料 (將會作為 State 傳入) ---
+    // --- 初始資料 (用作預設值，若無串接 GAS 則顯示這些) ---
     const initialNewsList = [
       { id: 1, date: "2026.04.18", title: "暖暖居家長照機構官方網站上線！", desc: "為了提供家屬與民眾更便捷的資訊管道，我們的官方網站正式啟用。歡迎多加利用線上費用試算與服務介紹功能。" },
       { id: 2, date: "2026.01.01", title: "115年度長照補助新制上路說明", desc: "配合政府政策更新，今年起失智症照顧對象年齡下修，新增急性後期整合照護計畫(PAC)收案對象，歡迎來電洽詢詳細資格。" }
     ];
 
     const initialPhotoList = [
-      { id: 1, title: "溫馨照顧陪伴", url: "https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?auto=format&fit=crop&w=800&q=80" },
-      { id: 2, title: "專業團隊會議", url: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80" },
-      { id: 3, title: "社區互動交流", url: "https://images.unsplash.com/photo-1573497620053-ea5300f94f21?auto=format&fit=crop&w=800&q=80" }
+      { id: 1, title: "溫馨照顧陪伴", url: "https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?auto=format&fit=crop&w=800&q=80", isPublished: true },
+      { id: 2, title: "專業團隊會議", url: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=80", isPublished: true },
+      { id: 3, title: "社區互動交流", url: "https://images.unsplash.com/photo-1573497620053-ea5300f94f21?auto=format&fit=crop&w=800&q=80", isPublished: true }
     ];
 
     // --- SVG 圖示組件 ---
@@ -242,13 +256,14 @@
     const Trash2 = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>;
     const Plus = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>;
     const BarChart = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg>;
+    const Cloud = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>;
 
     // 社群圖示
     const Facebook = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>;
     const Instagram = ({size=24, className=""}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>;
 
     // --- 後台管理組件 ---
-    const AdminPage = ({ newsData, setNewsData, photoData, setPhotoData, onLogout }) => {
+    const AdminPage = ({ newsData, setNewsData, photoData, setPhotoData, isPhotoLoading, togglePublishPhoto, onLogout }) => {
       const [adminTab, setAdminTab] = useState('dashboard');
       
       const [newNewsTitle, setNewNewsTitle] = useState('');
@@ -275,7 +290,7 @@
         setNewsData([newItem, ...newsData]);
         setNewNewsTitle('');
         setNewNewsDesc('');
-        alert('✅ 最新消息已成功發佈！您可以切換回首頁查看。');
+        alert('✅ 最新消息已成功暫存！\n\n(提醒：目前為純前端模式，重新整理網頁後資料會消失。未來可串接 Google Apps Script 永久儲存)');
       };
 
       const handleDeleteNews = (id) => {
@@ -284,8 +299,26 @@
         }
       };
 
-      const handleUploadPhoto = () => {
-        alert('這是一個前端展示。在實際環境中，這裡會將照片上傳至 Google Drive 或伺服器。');
+      // 處理真實檔案選擇並生成預覽 URL
+      const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const localPreviewUrl = URL.createObjectURL(file);
+        
+        const newPhoto = {
+          id: Date.now(),
+          title: file.name.split('.')[0],
+          url: localPreviewUrl,
+          isPublished: false // 新增的照片預設「不發佈」，僅供後台預覽
+        };
+
+        setPhotoData([newPhoto, ...photoData]);
+        alert('✅ 照片已載入後台預覽！\n\n(目前為未發佈狀態，請在下方列表中點擊「發佈至前台」以展示於官網)');
+      };
+
+      const handleUploadPhotoClick = () => {
+        fileInputRef.current.click();
       };
 
       const handleDeletePhoto = (id) => {
@@ -322,7 +355,7 @@
                       onClick={() => setAdminTab('gallery')} 
                       className={`w-full text-left px-5 py-3.5 rounded-2xl font-black text-sm transition-all flex items-center gap-3 ${adminTab==='gallery' ? 'bg-orange-500 text-white shadow-lg' : 'text-stone-400 hover:bg-orange-50 hover:text-orange-600'}`}
                     >
-                      <ImageIcon size={18} /> 活動照片更新
+                      <ImageIcon size={18} /> 照片管理與發佈
                     </button>
                   </nav>
                   <div className="mt-12 pt-8 border-t border-stone-100">
@@ -369,94 +402,71 @@
                   </div>
                 )}
 
-                {adminTab === 'news' && (
-                  <div className="space-y-8 animate-page">
-                    <div className="q-card p-8 md:p-12">
-                      <h3 className="text-2xl font-black text-gray-800 mb-8 flex items-center gap-3 border-b-2 border-orange-50 pb-4">
-                        <Plus size={28} className="text-orange-500 bg-orange-50 rounded-full p-1"/> 發佈新公告
-                      </h3>
-                      <div className="space-y-6">
-                        <div>
-                          <label className="text-xs font-black text-stone-400 uppercase tracking-widest mb-2 block ml-2">公告標題</label>
-                          <input 
-                            type="text" 
-                            className="admin-input" 
-                            placeholder="例如：115年度長照政策宣導" 
-                            value={newNewsTitle}
-                            onChange={(e) => setNewNewsTitle(e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <label className="text-xs font-black text-stone-400 uppercase tracking-widest mb-2 block ml-2">詳細內容</label>
-                          <textarea 
-                            className="admin-input min-h-[150px] resize-y" 
-                            placeholder="請輸入公告詳情..."
-                            value={newNewsDesc}
-                            onChange={(e) => setNewNewsDesc(e.target.value)}
-                          ></textarea>
-                        </div>
-                        <button 
-                          onClick={handleAddNews}
-                          className="bg-orange-500 text-white px-10 py-4 rounded-full font-black shadow-xl hover:scale-105 transition-all active:scale-95 flex items-center gap-2"
-                        >
-                          <CheckCircle size={20}/> 確認發佈至官網
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="q-card p-8 md:p-12">
-                      <h3 className="text-2xl font-black text-gray-800 mb-8 flex items-center gap-3 border-b-2 border-stone-50 pb-4">
-                        <NewspaperIcon size={24} className="text-stone-400"/> 已發佈消息列表
-                      </h3>
-                      <div className="space-y-4">
-                        {newsData.length === 0 ? (
-                          <div className="text-center text-stone-400 font-bold py-10">目前尚無消息。</div>
-                        ) : (
-                          newsData.map(news => (
-                            <div key={news.id} className="flex flex-col md:flex-row md:items-center justify-between p-5 bg-stone-50 border border-stone-100 rounded-3xl gap-4 hover:border-orange-200 transition-colors">
-                              <div className="flex-1">
-                                <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-[10px] font-black mr-3">{news.date}</span>
-                                <span className="font-black text-gray-800 text-lg">{news.title}</span>
-                                <p className="text-sm text-stone-500 mt-2 font-bold line-clamp-1">{news.desc}</p>
-                              </div>
-                              <button onClick={() => handleDeleteNews(news.id)} className="bg-white border border-red-100 text-red-400 hover:bg-red-50 hover:text-red-500 p-3 rounded-full shrink-0 transition-colors flex items-center justify-center">
-                                <Trash2 size={20}/>
-                              </button>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 {adminTab === 'gallery' && (
                   <div className="q-card p-8 md:p-12 animate-page">
                     <h3 className="text-2xl font-black text-gray-800 mb-8 flex items-center gap-3 border-b-2 border-orange-50 pb-4">
-                      <ImageIcon size={28} className="text-orange-500 bg-orange-50 rounded-full p-1"/> 更新活動照片
+                      <ImageIcon size={28} className="text-orange-500 bg-orange-50 rounded-full p-1"/> 網站照片管理 (預覽與發佈)
                     </h3>
                     
-                    <div onClick={handleUploadPhoto} className="border-4 border-dashed border-stone-200 rounded-[40px] p-16 text-center group hover:border-orange-300 hover:bg-orange-50/30 transition-all cursor-pointer mb-12">
-                       <div className="bg-orange-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 text-orange-400 group-hover:scale-110 group-hover:bg-orange-100 transition-transform">
-                         <Plus size={40}/>
+                    {/* 隱藏的檔案輸入框 */}
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      className="hidden" 
+                      ref={fileInputRef} 
+                      onChange={handleFileChange} 
+                    />
+
+                    <div onClick={handleUploadPhotoClick} className="border-4 border-dashed border-stone-200 rounded-[40px] p-12 text-center group hover:border-orange-300 hover:bg-orange-50/30 transition-all cursor-pointer mb-12">
+                       <div className="bg-orange-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-orange-400 group-hover:scale-110 group-hover:bg-orange-100 transition-transform">
+                         <Plus size={32}/>
                        </div>
-                       <p className="font-black text-stone-500 text-lg">點擊或拖曳照片上傳</p>
-                       <p className="text-xs text-stone-400 mt-2 font-bold">支援 JPG, PNG 格式，建議尺寸：1200x800px</p>
+                       <p className="font-black text-stone-500 text-lg">1. 點擊上傳新照片 (進入後台預覽)</p>
+                       <p className="text-xs text-stone-400 mt-2 font-bold">上傳後狀態為「未發佈」，確認後再手動發佈至前台</p>
                     </div>
 
-                    <h4 className="text-lg font-black text-gray-800 mb-6">目前網站圖庫</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                       {photoData.map(photo => (
-                         <div key={photo.id} className="aspect-square bg-stone-50 rounded-3xl border-4 border-white shadow-md overflow-hidden relative group">
-                            <img src={photo.url} alt={photo.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                               <button onClick={() => handleDeletePhoto(photo.id)} className="bg-red-500 text-white flex items-center gap-2 px-4 py-2 rounded-full font-black text-xs hover:bg-red-600 transition-colors">
-                                 <Trash2 size={16}/> 刪除照片
-                               </button>
-                            </div>
-                         </div>
-                       ))}
-                    </div>
+                    <h4 className="text-lg font-black text-gray-800 mb-6 flex items-center gap-2">
+                       <ImageIcon size={20} className="text-stone-400"/> 
+                       照片發佈管理庫
+                       {isPhotoLoading && <span className="text-sm text-orange-500 ml-4 animate-pulse">正在同步雲端...</span>}
+                    </h4>
+
+                    {isPhotoLoading ? (
+                      <div className="flex justify-center items-center py-20">
+                         <div className="w-10 h-10 border-4 border-orange-100 border-t-orange-500 rounded-full animate-spin"></div>
+                      </div>
+                    ) : photoData.length === 0 ? (
+                      <div className="bg-stone-50 border-2 border-dashed border-stone-200 rounded-3xl py-16 text-center text-stone-400 font-bold">
+                        目前圖庫為空，請上傳照片。
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                         {photoData.map(photo => (
+                           <div key={photo.id} className={`aspect-square bg-stone-100 rounded-2xl overflow-hidden relative group border-4 transition-colors ${photo.isPublished ? 'border-green-400 shadow-md' : 'border-stone-200 opacity-80'}`}>
+                              <img src={photo.url} alt={photo.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" />
+                              
+                              {/* 發佈狀態標籤 */}
+                              <div className="absolute top-2 left-2 z-10">
+                                {photo.isPublished ? (
+                                  <span className="bg-green-500 text-white px-2 py-1 rounded-lg text-[10px] font-black shadow-md flex items-center gap-1"><CheckCircle size={12}/> 前台展示中</span>
+                                ) : (
+                                  <span className="bg-stone-600 text-white px-2 py-1 rounded-lg text-[10px] font-black shadow-md flex items-center gap-1">待發佈 (僅預覽)</span>
+                                )}
+                              </div>
+
+                              {/* 懸停操作選單 */}
+                              <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-3 z-20">
+                                 <button onClick={() => togglePublishPhoto(photo.id)} className={`px-4 py-2 rounded-full font-black text-xs transition-colors w-28 text-center ${photo.isPublished ? 'bg-stone-600 text-white hover:bg-stone-500' : 'bg-orange-500 text-white hover:bg-orange-600'}`}>
+                                   {photo.isPublished ? '取消發佈' : '發佈至前台'}
+                                 </button>
+                                 <button onClick={() => handleDeletePhoto(photo.id)} className="bg-red-500 text-white px-4 py-2 rounded-full font-black text-xs hover:bg-red-600 transition-colors w-28 flex items-center justify-center gap-1">
+                                   <Trash2 size={14}/> 刪除
+                                 </button>
+                              </div>
+                           </div>
+                         ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -468,7 +478,7 @@
 
     // --- 子頁面組件 ---
 
-    const HomePage = ({ onNavigate, newsData, photoData }) => (
+    const HomePage = ({ onNavigate, newsData, photoData, isPhotoLoading }) => (
       <div className="animate-page pb-24">
         <section className="relative min-h-[75vh] flex items-center px-6 overflow-hidden hero-gradient py-20">
           <div className="absolute top-10 right-10 text-orange-200/40 animate-sun z-0">
@@ -567,13 +577,20 @@
                <h3 className="text-3xl font-black text-gray-800 tracking-tight">暖暖花絮</h3>
             </div>
 
-            {photoData.length === 0 ? (
+            {/* 加入從 Google Drive 讀取的載入狀態 */}
+            {isPhotoLoading ? (
+              <div className="text-center py-24 bg-[#FFF9F2] rounded-[45px] border-4 border-orange-100">
+                 <div className="w-12 h-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mx-auto mb-6"></div>
+                 <p className="text-orange-600 font-black text-lg tracking-widest animate-pulse">正在同步 Google 雲端硬碟照片...</p>
+                 <p className="text-stone-400 font-bold text-sm mt-2">Connecting to Google Drive</p>
+              </div>
+            ) : photoData.filter(p => p.isPublished).length === 0 ? (
                <div className="text-center py-20 bg-stone-50 rounded-[45px] text-stone-400 font-bold border-2 border-stone-100 border-dashed">
-                 照片整理中，敬請期待。
+                 目前尚未發佈任何照片，請至後台管理發佈。
                </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                {photoData.map((item, idx) => (
+                {photoData.filter(p => p.isPublished).map((item, idx) => (
                   <div key={item.id} className="group relative overflow-hidden rounded-[35px] aspect-[4/5] shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer bg-stone-200">
                     <img 
                       src={item.url} 
@@ -743,7 +760,7 @@
                              <tr className="border-b border-stone-50"><td className="px-4 py-3 font-black text-orange-400">GA03</td><td className="px-4 py-3">日間照顧中心喘息服務 - 全日</td><td className="px-4 py-3 font-black">1,250元 / 全日</td></tr>
                              <tr className="border-b border-stone-50"><td className="px-4 py-3 font-black text-orange-400">GA04</td><td className="px-4 py-3">日間照顧中心喘息服務 - 半日</td><td className="px-4 py-3 font-black">625元 / 半日</td></tr>
                              <tr className="border-b border-stone-50"><td className="px-4 py-3 font-black text-orange-400">GA05</td><td className="px-4 py-3">機構住宿式喘息服務</td><td className="px-4 py-3 font-black">2,310元 / 24小時(天)</td></tr>
-                             <tr className="border-b border-stone-50"><td className="px-4 py-3 font-black text-orange-400">GA06</td><td className="px-4 py-3">小規模多機能夜間喘息服務</td><td className="px-4 py-3 font-black">2,000元 / 下午6點至翌日上午8點</td></tr>
+                             <tr className="border-b border-stone-50"><td className="px-4 py-3 font-black text-orange-400">GA06</td><td className="px-4 py-3">小規模多機能夜間喘息服務</td><td className="px-4 py-3 font-black">2,000元 / 下午6點至翌日上午8点</td></tr>
                              <tr className="border-b border-stone-50"><td className="px-4 py-3 font-black text-orange-400">GA07</td><td className="px-4 py-3">巷弄長照站喘息服務</td><td className="px-4 py-3 font-black">170元 / 1小時</td></tr>
                              <tr><td className="px-4 py-3 font-black text-orange-400">GA09</td><td className="px-4 py-3">居家喘息服務</td><td className="px-4 py-3 font-black">770元 / 2小時</td></tr>
                            </tbody>
@@ -966,28 +983,63 @@
 
     // --- 主程式 App ---
     const App = () => {
-      // 頁面與權限狀態
       const [currentPage, setCurrentPage] = useState('home');
       const [isAdmin, setIsAdmin] = useState(false);
       
-      // 共用資料狀態 (將傳遞給前台與後台使用)
       const [newsData, setNewsData] = useState(initialNewsList);
-      const [photoData, setPhotoData] = useState(initialPhotoList);
+      // ==========================================
+      // 💡 照片資料與載入狀態設定
+      // ==========================================
+      const [photoData, setPhotoData] = useState([]);
+      const [isPhotoLoading, setIsPhotoLoading] = useState(true);
 
-      // UI 狀態
       const [isMenuOpen, setIsMenuOpen] = useState(false);
       const [scrolled, setScrolled] = useState(false);
       const [showTopBtn, setShowTopBtn] = useState(false);
       
-      // 登入彈窗狀態 (新增，取代 prompt)
       const [showLoginModal, setShowLoginModal] = useState(false);
       const [adminPassword, setAdminPassword] = useState('');
       const [loginError, setLoginError] = useState('');
       
-      // 試算表狀態
       const [level, setLevel] = useState('2');
       const [identity, setIdentity] = useState('16');
       const [quantities, setQuantities] = useState({});
+
+      // ==========================================
+      // 💡 一進入網站，立刻向 Google Apps Script 抓取照片
+      // ==========================================
+      useEffect(() => {
+        const fetchDrivePhotos = async () => {
+          setIsPhotoLoading(true);
+          
+          // 如果還沒填寫 API 網址，就載入預設照片
+          if (!GAS_PHOTO_API_URL || GAS_PHOTO_API_URL.includes("在此處貼上")) {
+            setPhotoData(initialPhotoList);
+            setIsPhotoLoading(false);
+            return;
+          }
+          
+          try {
+            const response = await fetch(GAS_PHOTO_API_URL);
+            const data = await response.json();
+            
+            // 如果抓到了資料且大於0筆，就顯示雲端的照片 (預設為已發佈)
+            if(data && data.length > 0) {
+              const publishedData = data.map(p => ({ ...p, isPublished: true }));
+              setPhotoData(publishedData);
+            } else {
+              setPhotoData([]); // 沒有照片則設為空
+            }
+          } catch (error) {
+            console.error('無法取得 Google Drive 照片:', error);
+            setPhotoData(initialPhotoList); // 失敗則使用預設照片
+          } finally {
+            setIsPhotoLoading(false);
+          }
+        };
+
+        fetchDrivePhotos();
+      }, []);
 
       useEffect(() => {
         const handleScroll = () => {
@@ -1029,12 +1081,18 @@
         setQuantities(prev => ({ ...prev, [code]: newQty }));
       };
 
+      // 管理相片發佈狀態
+      const togglePublishPhoto = (id) => {
+        setPhotoData(photoData.map(p => 
+          p.id === id ? { ...p, isPublished: !p.isPublished } : p
+        ));
+      };
+
       const navigate = (page) => {
         setCurrentPage(page);
         setIsMenuOpen(false);
       };
 
-      // 管理員登入邏輯：呼叫自訂的彈窗，不使用 prompt()
       const handleAdminLogin = () => {
         if(isAdmin) {
           navigate('admin');
@@ -1045,10 +1103,8 @@
         setLoginError('');
       };
 
-      // 處理密碼送出
       const handleLoginSubmit = (e) => {
         e.preventDefault();
-        // 密碼設定為 1542
         if (adminPassword === "1542") {
           setIsAdmin(true);
           setShowLoginModal(false);
@@ -1105,7 +1161,7 @@
           </nav>
 
           <main className="flex-grow">
-            {currentPage === 'home' && <HomePage onNavigate={navigate} newsData={newsData} photoData={photoData} />}
+            {currentPage === 'home' && <HomePage onNavigate={navigate} newsData={newsData} photoData={photoData} isPhotoLoading={isPhotoLoading} />}
             {currentPage === 'info' && <InfoPage onNavigate={navigate} />}
             {currentPage === 'calc' && <CalcPage level={level} setLevel={setLevel} identity={identity} setIdentity={setIdentity} quantities={quantities} handleQtyChange={handleQtyChange} calcResults={calcResults} />}
             {currentPage === 'social' && <SocialPage />}
@@ -1117,6 +1173,8 @@
                 setNewsData={setNewsData} 
                 photoData={photoData} 
                 setPhotoData={setPhotoData}
+                isPhotoLoading={isPhotoLoading}
+                togglePublishPhoto={togglePublishPhoto}
                 onLogout={() => { setIsAdmin(false); navigate('home'); }} 
               />
             )}
@@ -1210,7 +1268,7 @@
             </a>
           </div>
 
-          {/* 自訂登入密碼彈窗 (修復：不會被阻擋) */}
+          {/* 自訂登入密碼彈窗 */}
           {showLoginModal && (
             <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4 animate-page">
               <div className="bg-white rounded-[40px] p-10 max-w-sm w-full shadow-2xl text-center relative">
