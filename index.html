@@ -125,6 +125,7 @@
     // --- 靜態資料定義 ---
     const fullBrandName = "暖暖有限公司附設彰化縣私立暖暖居家長照機構";
     const lineUrl = "https://line.me/ti/p/@957jphho";
+    const recruitLineUrl = "https://line.me/ti/p/~nuannuanhomecare";
     const fbUrl = "https://www.facebook.com/share/1GfbMFRv18/?mibextid=wwXIfr";
     const igUrl = "https://www.instagram.com/nuannuanltc?igsh=MWl4NTNtdmQ0Y2h6aQ%3D%3D&utm_source=qr";
     
@@ -431,52 +432,13 @@
                     「提供完善的薪資及福利制度，包含績效獎金與員工酬勞…等，與同仁共同分享營運上的成果，也獎勵同仁在公司的辛勞及貢獻。」
                   </p>
                </div>
-               <a href={lineUrl} target="_blank" className="inline-flex items-center gap-4 bg-green-500 text-white px-14 py-6 rounded-full font-black text-xl shadow-2xl hover:scale-105 transition active:scale-95">
-                  <MessageCircle size={32}/> LINE 應徵洽詢
-               </a>
+               <div className="text-center pt-6">
+                 <a href={recruitLineUrl} target="_blank" className="inline-flex items-center gap-4 bg-green-500 text-white px-14 py-6 rounded-full font-black text-xl shadow-2xl hover:scale-105 transition active:scale-95">
+                    <MessageCircle size={32}/> LINE 應徵洽詢
+                 </a>
+                 <p className="mt-6 text-stone-400 font-bold text-sm tracking-widest">LINE ID: nuannuanhomecare</p>
+               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    );
-
-    const SocialPage = () => (
-      <div className="pt-28 pb-24 px-6 bg-white min-h-screen animate-page text-center">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="mb-16 animate-card">
-             <div className="bg-orange-500 w-24 h-24 rounded-[40px] flex items-center justify-center text-white mx-auto mb-8 shadow-xl animate-sun">
-                <MessageCircle size={48}/>
-             </div>
-             <h2 className="text-4xl font-black text-gray-800 mb-4 tracking-tighter uppercase font-black">社群連結</h2>
-             <p className="text-stone-500 text-sm font-bold italic underline decoration-orange-200 decoration-8 underline-offset-[-2px]">追蹤暖暖日常，掌握最新長照資訊</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            <a href={fbUrl} target="_blank" rel="noopener noreferrer" className="q-card p-10 flex flex-col items-center justify-center gap-6 hover:bg-blue-50 transition-all group cursor-pointer border-blue-100 shadow-sm hover:border-blue-300">
-               <div className="bg-blue-600 p-6 rounded-3xl text-white shadow-xl group-hover:scale-110 transition-transform">
-                 <Facebook size={48} />
-               </div>
-               <div>
-                 <h3 className="text-2xl font-black text-blue-900 mb-2">Facebook 粉絲團</h3>
-                 <p className="text-blue-600/70 font-bold text-sm">點擊前往按讚追蹤</p>
-               </div>
-            </a>
-
-            <a href={igUrl} target="_blank" rel="noopener noreferrer" className="q-card p-10 flex flex-col items-center justify-center gap-6 hover:bg-pink-50 transition-all group cursor-pointer border-pink-100 shadow-sm hover:border-pink-300">
-               <div className="bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 p-6 rounded-3xl text-white shadow-xl group-hover:scale-110 transition-transform">
-                 <Instagram size={48} />
-               </div>
-               <div>
-                 <h3 className="text-2xl font-black text-pink-900 mb-2">Instagram 官方帳號</h3>
-                 <p className="text-pink-600/70 font-bold text-sm">點擊查看暖暖日常</p>
-               </div>
-            </a>
-          </div>
-          
-          <div className="mt-16 text-center">
-             <button onClick={() => window.history.back()} className="text-stone-400 font-bold hover:text-orange-500 transition underline underline-offset-4">
-                返回上一頁
-             </button>
           </div>
         </div>
       </div>
