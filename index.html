@@ -5,24 +5,53 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   
-  <!-- 1. 修改搜尋引擎標題 -->
+  <!-- 1. 搜尋引擎標題與描述 -->
   <title>暖暖有限公司附設彰化縣私立暖暖居家長照機構 - 專業服務長照3.0</title>
   <meta name="description" content="暖暖有限公司附設彰化縣私立暖暖居家長照機構，由專業社工師帶領，深耕彰化大城，提供專業居家服務、交通接送、輔具改善及喘息服務。">
   
-  <!-- 2. 增加 Google 搜尋與社群分享的預覽縮圖 (Open Graph & Schema) -->
+  <!-- 2. Google 搜尋預覽縮圖 (Schema) -->
   <meta itemprop="name" content="暖暖有限公司附設彰化縣私立暖暖居家長照機構 - 專業服務長照3.0">
   <meta itemprop="description" content="深耕彰化大城，提供專業居家照護服務。">
-  <meta itemprop="image" content="logo.JPG">
+  <!-- 【重要修正】改為絕對網址 -->
+  <meta itemprop="image" content="https://nuannuanhomecare.com/logo.JPG">
   
+  <!-- 3. 社群分享預覽縮圖 (Open Graph for FB, LINE) -->
   <meta property="og:title" content="暖暖有限公司附設彰化縣私立暖暖居家長照機構 - 專業服務長照3.0">
   <meta property="og:description" content="暖暖有限公司附設彰化縣私立暖暖居家長照機構，由專業社工師帶領，深耕彰化大城，提供專業居家服務、交通接送、輔具改善及喘息服務。">
-  <meta property="og:image" content="logo.JPG">
-  <meta property="og:url" content="https://您的網站網址.com">
+  <!-- 【重要修正】改為絕對網址 -->
+  <meta property="og:image" content="https://nuannuanhomecare.com/logo.JPG">
+  <!-- 建議加入圖片尺寸幫助社群軟體快速抓取 -->
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <!-- 【重要修正】換成正式網址 -->
+  <meta property="og:url" content="https://nuannuanhomecare.com">
   <meta property="og:type" content="website">
 
-  <!-- 3. 新增瀏覽器分頁標籤圖示 -->
-  <link rel="icon" href="logo.JPG" type="image/jpeg">
+  <!-- 4. 瀏覽器分頁標籤圖示 (Favicon) -->
+  <link rel="icon" href="https://nuannuanhomecare.com/logo.JPG" type="image/jpeg">
+
+  <!-- 5. 【新增】JSON-LD 結構化資料，提升 Google 搜尋結果呈現與在地商家關聯 -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HealthAndBeautyBusiness",
+    "name": "暖暖居家長照機構",
+    "image": "https://nuannuanhomecare.com/logo.JPG",
+    "@id": "https://nuannuanhomecare.com",
+    "url": "https://nuannuanhomecare.com",
+    "telephone": "0901-071-711",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "西勢路30號",
+      "addressLocality": "大城鄉",
+      "addressRegion": "彰化縣",
+      "postalCode": "527",
+      "addressCountry": "TW"
+    }
+  }
+  </script>
   
+  <!-- 載入外部資源 (Tailwind, React, Babel) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
