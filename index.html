@@ -152,7 +152,7 @@
     // ==========================================
     const GAS_PHOTO_API_URL = "https://script.google.com/macros/s/AKfycbwG2HthS6svaJGiM9PLVQlYFJRXgWyBQhQNGLH6hJxkkfKeTKLMzY902zi1JegwsthjWw/exec"; 
     
-    // 免設定的輕量級雲端儲存 API (取代 Firebase，負責跨設備同步)
+    // 免設定的輕量級雲端儲存 API (負責跨設備同步)
     const CLOUD_BIN_ID = "nuannuan-care-sync-v1";
     const CLOUD_DATA_URL = `https://kvdb.io/${CLOUD_BIN_ID}/site_content`;
     const CLOUD_STATS_URL = `https://kvdb.io/${CLOUD_BIN_ID}/site_stats`;
@@ -327,7 +327,7 @@
 
     // --- 子頁面組件 ---
 
-    // 💡 後台管理組件
+    // 💡 後台管理組件 (整合輕量雲端 KVDB 即時數據)
     const AdminPage = ({ stats, loadingStats, newsData, setNewsData, photoData, setPhotoData, serviceAreas, setServiceAreas, faqData, setFaqData, isPhotoLoading, syncDrivePhotos, togglePublishPhoto, onLogout }) => {
       const [adminTab, setAdminTab] = useState('dashboard');
       
@@ -473,19 +473,19 @@
                         <div className="bg-stone-50 p-6 rounded-3xl border border-stone-100 shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
                           <p className="text-stone-400 font-bold text-sm relative z-10">本月網站瀏覽人次</p>
                           <h4 className="text-4xl font-black text-gray-800 mt-2 relative z-10">{loadingStats ? '...' : (stats.pageViews || 0).toLocaleString()}</h4>
-                          <p className="text-green-500 text-xs font-black mt-2 relative z-10">即時追蹤中</p>
+                          <p className="text-green-500 text-xs font-black mt-2 relative z-10">即時雲端追蹤中</p>
                           {loadingStats && <div className="absolute inset-0 bg-stone-100 animate-pulse"></div>}
                         </div>
                         <div className="bg-stone-50 p-6 rounded-3xl border border-stone-100 shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
                           <p className="text-stone-400 font-bold text-sm relative z-10">費用試算使用次數</p>
                           <h4 className="text-4xl font-black text-gray-800 mt-2 relative z-10">{loadingStats ? '...' : (stats.calcUses || 0).toLocaleString()}</h4>
-                          <p className="text-green-500 text-xs font-black mt-2 relative z-10">即時追蹤中</p>
+                          <p className="text-green-500 text-xs font-black mt-2 relative z-10">即時雲端追蹤中</p>
                           {loadingStats && <div className="absolute inset-0 bg-stone-100 animate-pulse"></div>}
                         </div>
                         <div className="bg-stone-50 p-6 rounded-3xl border border-stone-100 shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
                           <p className="text-stone-400 font-bold text-sm relative z-10">LINE 點擊諮詢數</p>
                           <h4 className="text-4xl font-black text-gray-800 mt-2 relative z-10">{loadingStats ? '...' : (stats.lineClicks || 0).toLocaleString()}</h4>
-                          <p className="text-orange-500 text-xs font-black mt-2 relative z-10">即時追蹤中</p>
+                          <p className="text-orange-500 text-xs font-black mt-2 relative z-10">即時雲端追蹤中</p>
                           {loadingStats && <div className="absolute inset-0 bg-stone-100 animate-pulse"></div>}
                         </div>
                       </div>
@@ -1682,10 +1682,10 @@
           syncToCloud(newsData, photoData, serviceAreas, newData); 
       };
 
-      // 💡 載入公用雲端資料與數據
+      // 💡 載入公用雲端資料與數據 (加入 ?nocache=時間戳 解決手機端快取不更新的問題)
       useEffect(() => {
          // 抓取網站內容
-         fetch(DATA_API_URL)
+         fetch(`${DATA_API_URL}?nocache=${new Date().getTime()}`, { cache: 'no-store' })
             .then(res => { if(res.ok) return res.json(); throw new Error('Cloud Empty'); })
             .then(data => {
                 if (data.newsData) { setNewsData(data.newsData); localStorage.setItem('nuannuan_news_db', JSON.stringify(data.newsData)); }
@@ -1699,7 +1699,7 @@
             });
 
          // 抓取流量數據
-         fetch(STATS_API_URL)
+         fetch(`${STATS_API_URL}?nocache=${new Date().getTime()}`, { cache: 'no-store' })
             .then(res => { if(res.ok) return res.json(); throw new Error('Stats Empty'); })
             .then(data => { setStats(data); setLoadingStats(false); })
             .catch(() => { setLoadingStats(false); });
@@ -1708,7 +1708,7 @@
       // 💡 流量追蹤器
       useEffect(() => {
         trackEventRef.current = (eventName) => {
-           fetch(STATS_API_URL)
+           fetch(`${STATS_API_URL}?nocache=${new Date().getTime()}`, { cache: 'no-store' })
               .then(res => res.ok ? res.json() : { pageViews: 0, calcUses: 0, lineClicks: 0 })
               .then(currentStats => {
                  const newStats = { ...currentStats, [eventName]: (currentStats[eventName] || 0) + 1 };
@@ -1888,13 +1888,17 @@
         <div className="min-h-screen flex flex-col overflow-x-hidden">
           <nav className={`fixed w-full z-[100] transition-all duration-500 ${scrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-8'}`}>
             <div className="max-w-[1500px] mx-auto px-6 md:px-8 flex justify-between items-center">
-              <div className="flex items-center gap-3 md:gap-4 cursor-pointer group shrink-0" onClick={() => navigate('home')}>
-                <div className="bg-orange-500 p-2.5 rounded-2xl text-white shadow-2xl animate-sun group-hover:rotate-12 transition duration-300"><Sun size={32} /></div>
-                <div className="flex flex-col text-left leading-tight hidden sm:flex">
-                  <span className="font-black text-[11px] sm:text-xs md:text-sm tracking-tighter text-gray-900 leading-tight">{fullBrandName}</span>
-                  <span className="text-[9px] md:text-[10px] font-black text-orange-500 tracking-widest uppercase">府授衛長字第1150109649號</span>
+              {/* 💡 修正：移除 hidden sm:flex，讓標題在手機版正常顯示，並設定最大寬度防跑版 */}
+              <div className="flex items-center gap-2 md:gap-4 cursor-pointer group shrink-0" onClick={() => navigate('home')}>
+                <div className="bg-orange-500 p-2 md:p-2.5 rounded-2xl text-white shadow-2xl animate-sun group-hover:rotate-12 transition duration-300 shrink-0">
+                  <Sun size={28} className="md:w-8 md:h-8" />
+                </div>
+                <div className="flex flex-col text-left leading-tight max-w-[220px] sm:max-w-none">
+                  <span className="font-black text-[10px] sm:text-xs md:text-sm tracking-tighter text-gray-900 leading-tight truncate sm:text-clip">{fullBrandName}</span>
+                  <span className="text-[8px] sm:text-[9px] md:text-[10px] font-black text-orange-500 tracking-widest uppercase mt-0.5">府授衛長字第1150109649號</span>
                 </div>
               </div>
+              
               <div className={`hidden lg:flex gap-6 xl:gap-10 items-center font-black text-sm uppercase tracking-widest shrink-0`}>
                 <button onClick={() => navigate('home')} className={`hover:text-orange-500 ${['home', 'album'].includes(currentPage)?'text-orange-500 underline underline-offset-[16px] decoration-4':''}`}>首頁故事</button>
                 <button onClick={() => navigate('info')} className={`hover:text-orange-500 ${currentPage==='info'?'text-orange-500 underline underline-offset-[16px] decoration-4':''}`}>服務與對象</button>
