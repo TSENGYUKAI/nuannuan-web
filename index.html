@@ -122,7 +122,7 @@
       overflow-y: auto;
     }
     
-    /* 彰化縣地圖輪廓 (利用 SVG 遮罩) */
+    /* 彰化縣地圖輪廓 */
     .changhua-map-mask {
       -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M80 10 L120 15 L140 40 L160 50 L180 80 L190 120 L170 160 L140 200 L120 230 L80 240 L50 210 L30 180 L10 140 L20 90 L40 50 Z' fill='black'/%3E%3C/svg%3E");
       mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M80 10 L120 15 L140 40 L160 50 L180 80 L190 120 L170 160 L140 200 L120 230 L80 240 L50 210 L30 180 L10 140 L20 90 L40 50 Z' fill='black'/%3E%3C/svg%3E");
@@ -144,29 +144,19 @@
     </div>
   </div>
 
-  <!-- 💡 繞過 Babel 解析的 Firebase 原生模組載入器 -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-    import { getFirestore, doc, setDoc, updateDoc, increment, onSnapshot, collection } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
-
-    window.FirebaseModules = {
-      initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged,
-      getFirestore, doc, setDoc, updateDoc, increment, onSnapshot, collection
-    };
-    window.dispatchEvent(new Event('firebase-modules-loaded'));
-  </script>
-
-  <!-- 💡 使用 data-presets="react" 避免 Babel 轉譯 async/await 產生 require 錯誤 -->
   <script type="text/babel" data-presets="react">
     const { useState, useEffect, useMemo, useRef } = React;
     
     // ==========================================
-    // 💡 串接設定區 
+    // 💡 雲端同步設定與靜態資料區 
     // ==========================================
     const GAS_PHOTO_API_URL = "https://script.google.com/macros/s/AKfycbwG2HthS6svaJGiM9PLVQlYFJRXgWyBQhQNGLH6hJxkkfKeTKLMzY902zi1JegwsthjWw/exec"; 
     
-    // --- 靜態資料定義 ---
+    // 免設定的輕量級雲端儲存 API (取代 Firebase，負責跨設備同步)
+    const CLOUD_BIN_ID = "nuannuan-care-sync-v1";
+    const CLOUD_DATA_URL = `https://kvdb.io/${CLOUD_BIN_ID}/site_content`;
+    const CLOUD_STATS_URL = `https://kvdb.io/${CLOUD_BIN_ID}/site_stats`;
+
     const fullBrandName = "暖暖有限公司附設彰化縣私立暖暖居家長照機構";
     const lineUrl = "https://line.me/ti/p/@957jphho";
     const recruitLineUrl = "https://line.me/ti/p/~nuannuanhomecare";
@@ -175,6 +165,7 @@
     
     const PHOTO_CATEGORIES = ['溫馨照顧陪伴', '專業團隊', '社區活動交流'];
 
+    // 初始預設資料
     const initialServiceAreas = ['大城鄉', '芳苑鄉', '二林鎮', '竹塘鄉', '埤頭鄉', '員林市', '埔心鄉', '溪湖鎮', '永靖鄉', '社頭鄉', '彰化市', '花壇鄉', '大村鄉'];
 
     const levelData = {
@@ -336,8 +327,8 @@
 
     // --- 子頁面組件 ---
 
-    // 💡 後台管理組件 (整合 Firebase 即時數據與修正高度限制)
-    const AdminPage = ({ fb, newsData, setNewsData, photoData, setPhotoData, serviceAreas, setServiceAreas, faqData, setFaqData, isPhotoLoading, syncDrivePhotos, togglePublishPhoto, onLogout }) => {
+    // 💡 後台管理組件
+    const AdminPage = ({ stats, loadingStats, newsData, setNewsData, photoData, setPhotoData, serviceAreas, setServiceAreas, faqData, setFaqData, isPhotoLoading, syncDrivePhotos, togglePublishPhoto, onLogout }) => {
       const [adminTab, setAdminTab] = useState('dashboard');
       
       const [newNewsTitle, setNewNewsTitle] = useState('');
@@ -352,29 +343,6 @@
       const [lookerUrl, setLookerUrl] = useState(() => localStorage.getItem('lookerUrl') || '');
       const [isEditingLooker, setIsEditingLooker] = useState(!localStorage.getItem('lookerUrl'));
       const [tempLookerUrl, setTempLookerUrl] = useState(() => localStorage.getItem('lookerUrl') || '');
-      
-      // 💡 Firebase 即時數據狀態
-      const [stats, setStats] = useState({ pageViews: 0, calcUses: 0, lineClicks: 0 });
-      const [loadingStats, setLoadingStats] = useState(true);
-
-      useEffect(() => {
-        if (!fb || !fb.user) return;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const docId = `${new Date().getFullYear()}_${new Date().getMonth() + 1}`;
-        const docRef = fb.doc(fb.db, 'artifacts', appId, 'public', 'data', 'stats', docId);
-
-        const unsubscribe = fb.onSnapshot(docRef, (snap) => {
-           if (snap.exists()) {
-              setStats(snap.data());
-           }
-           setLoadingStats(false);
-        }, (err) => {
-           console.error("Stats listen error", err);
-           setLoadingStats(false);
-        });
-
-        return () => unsubscribe();
-      }, [fb]);
 
       const handleSaveLookerUrl = () => {
         if (tempLookerUrl && !tempLookerUrl.startsWith('http')) {
@@ -501,29 +469,27 @@
                         <BarChart size={28} className="text-orange-500 bg-orange-50 rounded-full p-1"/> 網站流量與數據概況
                       </h3>
                       
-                      {/* 💡 導入 Firebase 即時數據 */}
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div className="bg-stone-50 p-6 rounded-3xl border border-stone-100 shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
                           <p className="text-stone-400 font-bold text-sm relative z-10">本月網站瀏覽人次</p>
-                          <h4 className="text-4xl font-black text-gray-800 mt-2 relative z-10">{loadingStats ? '...' : stats.pageViews.toLocaleString()}</h4>
+                          <h4 className="text-4xl font-black text-gray-800 mt-2 relative z-10">{loadingStats ? '...' : (stats.pageViews || 0).toLocaleString()}</h4>
                           <p className="text-green-500 text-xs font-black mt-2 relative z-10">即時追蹤中</p>
                           {loadingStats && <div className="absolute inset-0 bg-stone-100 animate-pulse"></div>}
                         </div>
                         <div className="bg-stone-50 p-6 rounded-3xl border border-stone-100 shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
                           <p className="text-stone-400 font-bold text-sm relative z-10">費用試算使用次數</p>
-                          <h4 className="text-4xl font-black text-gray-800 mt-2 relative z-10">{loadingStats ? '...' : stats.calcUses.toLocaleString()}</h4>
+                          <h4 className="text-4xl font-black text-gray-800 mt-2 relative z-10">{loadingStats ? '...' : (stats.calcUses || 0).toLocaleString()}</h4>
                           <p className="text-green-500 text-xs font-black mt-2 relative z-10">即時追蹤中</p>
                           {loadingStats && <div className="absolute inset-0 bg-stone-100 animate-pulse"></div>}
                         </div>
                         <div className="bg-stone-50 p-6 rounded-3xl border border-stone-100 shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
                           <p className="text-stone-400 font-bold text-sm relative z-10">LINE 點擊諮詢數</p>
-                          <h4 className="text-4xl font-black text-gray-800 mt-2 relative z-10">{loadingStats ? '...' : stats.lineClicks.toLocaleString()}</h4>
+                          <h4 className="text-4xl font-black text-gray-800 mt-2 relative z-10">{loadingStats ? '...' : (stats.lineClicks || 0).toLocaleString()}</h4>
                           <p className="text-orange-500 text-xs font-black mt-2 relative z-10">即時追蹤中</p>
                           {loadingStats && <div className="absolute inset-0 bg-stone-100 animate-pulse"></div>}
                         </div>
                       </div>
 
-                      {/* 💡 修改：修正高度設定，避免修改報表來源時跑版 */}
                       <div className="bg-stone-50 p-6 md:p-8 rounded-3xl border border-stone-100 shadow-sm h-[550px] flex flex-col relative overflow-hidden group">
                         <div className="flex justify-between items-center mb-6 shrink-0">
                            <h4 className="font-black text-gray-800 flex items-center gap-2">
@@ -1650,8 +1616,6 @@
       const [currentPage, setCurrentPage] = useState('home');
       const [selectedAlbum, setSelectedAlbum] = useState(null);
 
-      // 💡 Firebase 即時數據追蹤狀態
-      const [fb, setFb] = useState(null);
       const trackEventRef = useRef(null);
       const [calcTracked, setCalcTracked] = useState(false);
 
@@ -1661,8 +1625,10 @@
       const [loginError, setLoginError] = useState('');
 
       const [isPhotoLoading, setIsPhotoLoading] = useState(false);
+      const [stats, setStats] = useState({ pageViews: 0, calcUses: 0, lineClicks: 0 });
+      const [loadingStats, setLoadingStats] = useState(true);
       
-      // 💡 加入 localStorage 雙層緩存，確保重新整理瞬間抓取最新本地存檔，不跑版不遺原
+      // 💡 雙層緩存機制 (優先抓取最新 localStorage，並準備覆寫雲端)
       const [newsData, setNewsData] = useState(() => {
         const saved = localStorage.getItem('nuannuan_news_db');
         return saved ? JSON.parse(saved) : initialNewsList;
@@ -1680,35 +1646,83 @@
         return saved ? JSON.parse(saved) : initialFaqData;
       });
 
-      const syncToCloud = (key, data) => {
-        if (!fb || !fb.user) return;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const contentDocRef = fb.doc(fb.db, 'artifacts', appId, 'public', 'data', 'siteContent', 'main');
-        fb.setDoc(contentDocRef, { [key]: data }, { merge: true }).catch(err => {
-           console.error(`Error syncing ${key}`, err);
-        });
+      // 💡 免設定公用 API 網址
+      const CLOUD_BASE_ID = "nuannuan-care-sync-v1";
+      const DATA_API_URL = `https://kvdb.io/${CLOUD_BASE_ID}/site_content`;
+      const STATS_API_URL = `https://kvdb.io/${CLOUD_BASE_ID}/site_stats`;
+
+      // 💡 寫入公用雲端
+      const syncToCloud = (news, photos, areas, faqs) => {
+        const payload = { newsData: news, photoData: photos, serviceAreas: areas, faqData: faqs };
+        fetch(DATA_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        }).catch(err => console.error('Cloud Sync Error', err));
       };
 
       const updateNewsData = (newData) => { 
           setNewsData(newData); 
           localStorage.setItem('nuannuan_news_db', JSON.stringify(newData));
-          syncToCloud('newsData', newData); 
+          syncToCloud(newData, photoData, serviceAreas, faqData); 
       };
       const updatePhotoData = (newData) => { 
           setPhotoData(newData); 
           localStorage.setItem('nuannuan_photos_db', JSON.stringify(newData));
-          syncToCloud('photoData', newData); 
+          syncToCloud(newsData, newData, serviceAreas, faqData); 
       };
       const updateServiceAreas = (newData) => { 
           setServiceAreas(newData); 
           localStorage.setItem('nuannuan_areas_db', JSON.stringify(newData));
-          syncToCloud('serviceAreas', newData); 
+          syncToCloud(newsData, photoData, newData, faqData); 
       };
       const updateFaqData = (newData) => { 
           setFaqData(newData); 
           localStorage.setItem('nuannuan_faq_db', JSON.stringify(newData));
-          syncToCloud('faqData', newData); 
+          syncToCloud(newsData, photoData, serviceAreas, newData); 
       };
+
+      // 💡 載入公用雲端資料與數據
+      useEffect(() => {
+         // 抓取網站內容
+         fetch(DATA_API_URL)
+            .then(res => { if(res.ok) return res.json(); throw new Error('Cloud Empty'); })
+            .then(data => {
+                if (data.newsData) { setNewsData(data.newsData); localStorage.setItem('nuannuan_news_db', JSON.stringify(data.newsData)); }
+                if (data.photoData) { setPhotoData(data.photoData); localStorage.setItem('nuannuan_photos_db', JSON.stringify(data.photoData)); }
+                if (data.serviceAreas) { setServiceAreas(data.serviceAreas); localStorage.setItem('nuannuan_areas_db', JSON.stringify(data.serviceAreas)); }
+                if (data.faqData) { setFaqData(data.faqData); localStorage.setItem('nuannuan_faq_db', JSON.stringify(data.faqData)); }
+            })
+            .catch(() => {
+                // 如果雲端為空，則把目前本機的最新資料上傳作為基準
+                syncToCloud(newsData, photoData, serviceAreas, faqData);
+            });
+
+         // 抓取流量數據
+         fetch(STATS_API_URL)
+            .then(res => { if(res.ok) return res.json(); throw new Error('Stats Empty'); })
+            .then(data => { setStats(data); setLoadingStats(false); })
+            .catch(() => { setLoadingStats(false); });
+      }, []);
+
+      // 💡 流量追蹤器
+      useEffect(() => {
+        trackEventRef.current = (eventName) => {
+           fetch(STATS_API_URL)
+              .then(res => res.ok ? res.json() : { pageViews: 0, calcUses: 0, lineClicks: 0 })
+              .then(currentStats => {
+                 const newStats = { ...currentStats, [eventName]: (currentStats[eventName] || 0) + 1 };
+                 fetch(STATS_API_URL, { method: 'POST', body: JSON.stringify(newStats) });
+                 setStats(newStats); 
+              }).catch(e => console.error(e));
+        };
+        
+        if (!window.__trackedPv) {
+          window.__trackedPv = true;
+          // 延遲 1 秒發送，確保雲端有反應時間
+          setTimeout(() => { if (trackEventRef.current) trackEventRef.current('pageViews'); }, 1000);
+        }
+      }, []);
 
       const [isMenuOpen, setIsMenuOpen] = useState(false);
       const [scrolled, setScrolled] = useState(false);
@@ -1718,103 +1732,6 @@
       const [identity, setIdentity] = useState('16');
       const [quantities, setQuantities] = useState({});
 
-      // 💡 Firebase 初始化與驗證設定 (移除 async/await 改用 Promise .then，徹底修復 require 錯誤)
-      useEffect(() => {
-        let unsubscribeAuth;
-        const initFb = () => {
-          try {
-            if (typeof __firebase_config === 'undefined' || !window.FirebaseModules) return; 
-
-            const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, doc, setDoc, updateDoc, increment, onSnapshot, collection } = window.FirebaseModules;
-
-            const firebaseConfig = JSON.parse(__firebase_config);
-            const app = initializeApp(firebaseConfig);
-            const auth = getAuth(app);
-            const db = getFirestore(app);
-
-            const doAuth = () => {
-              if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                return signInWithCustomToken(auth, __initial_auth_token);
-              } else {
-                return signInAnonymously(auth);
-              }
-            };
-            
-            doAuth().catch(err => console.error('Auth Error:', err));
-
-            unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-              if (user) {
-                setFb({ db, user, increment, doc, setDoc, updateDoc, onSnapshot, collection });
-              }
-            });
-          } catch (err) {
-            console.error('Firebase Init Error:', err);
-          }
-        };
-
-        if (window.FirebaseModules) {
-          initFb();
-        } else {
-          window.addEventListener('firebase-modules-loaded', initFb);
-        }
-
-        return () => { 
-          if(unsubscribeAuth) unsubscribeAuth(); 
-          window.removeEventListener('firebase-modules-loaded', initFb);
-        };
-      }, []);
-
-      // 💡 雲端內容即時同步 (結合 LocalStorage 達成極速與跨裝置同步)
-      useEffect(() => {
-        if (!fb || !fb.user) return;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const contentDocRef = fb.doc(fb.db, 'artifacts', appId, 'public', 'data', 'siteContent', 'main');
-
-        const unsubscribe = fb.onSnapshot(contentDocRef, (snap) => {
-           if (snap.exists()) {
-              const data = snap.data();
-              if (data.newsData) { setNewsData(data.newsData); localStorage.setItem('nuannuan_news_db', JSON.stringify(data.newsData)); }
-              if (data.photoData) { setPhotoData(data.photoData); localStorage.setItem('nuannuan_photos_db', JSON.stringify(data.photoData)); }
-              if (data.serviceAreas) { setServiceAreas(data.serviceAreas); localStorage.setItem('nuannuan_areas_db', JSON.stringify(data.serviceAreas)); }
-              if (data.faqData) { setFaqData(data.faqData); localStorage.setItem('nuannuan_faq_db', JSON.stringify(data.faqData)); }
-           } else {
-              // 首次使用，將預設資料寫入雲端
-              fb.setDoc(contentDocRef, {
-                 newsData: initialNewsList,
-                 photoData: initialPhotoList,
-                 serviceAreas: initialServiceAreas,
-                 faqData: initialFaqData
-              });
-           }
-        }, (err) => console.error("Content listen error", err));
-
-        return () => unsubscribe();
-      }, [fb]);
-
-      // 💡 Firebase 追蹤器實作
-      useEffect(() => {
-        if (fb) {
-          trackEventRef.current = (eventName) => {
-            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-            const docId = `${new Date().getFullYear()}_${new Date().getMonth() + 1}`;
-            const docRef = fb.doc(fb.db, 'artifacts', appId, 'public', 'data', 'stats', docId);
-            
-            fb.updateDoc(docRef, { [eventName]: fb.increment(1) }).catch(e => {
-               if (e.code === 'not-found') {
-                  fb.setDoc(docRef, { pageViews: 0, calcUses: 0, lineClicks: 0, [eventName]: 1 }, { merge: true });
-               }
-            });
-          };
-          
-          // 若為初次載入，觸發網頁瀏覽追蹤
-          if (!window.__trackedPv) {
-            window.__trackedPv = true;
-            trackEventRef.current('pageViews');
-          }
-        }
-      }, [fb]);
-
-      // 行為處理器
       const handleLineClick = () => {
          if (trackEventRef.current) trackEventRef.current('lineClicks');
       };
@@ -2027,7 +1944,8 @@
 
             {currentPage === 'admin' && isAdmin && (
               <AdminPage 
-                fb={fb}
+                stats={stats}
+                loadingStats={loadingStats}
                 newsData={newsData} 
                 setNewsData={updateNewsData} 
                 photoData={photoData} 
