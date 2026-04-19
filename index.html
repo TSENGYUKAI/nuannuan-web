@@ -144,19 +144,27 @@
     </div>
   </div>
 
+  <!-- 💡 Firebase 原生模組載入器 -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+    import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+    import { getFirestore, doc, setDoc, updateDoc, increment, onSnapshot, collection } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+    window.FirebaseModules = {
+      initializeApp, getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
+      getFirestore, doc, setDoc, updateDoc, increment, onSnapshot, collection
+    };
+    window.dispatchEvent(new Event('firebase-modules-loaded'));
+  </script>
+
   <script type="text/babel" data-presets="react">
     const { useState, useEffect, useMemo, useRef } = React;
     
     // ==========================================
-    // 💡 雲端同步設定與靜態資料區 
+    // 💡 基礎設定與靜態資料 
     // ==========================================
     const GAS_PHOTO_API_URL = "https://script.google.com/macros/s/AKfycbwG2HthS6svaJGiM9PLVQlYFJRXgWyBQhQNGLH6hJxkkfKeTKLMzY902zi1JegwsthjWw/exec"; 
     
-    // 免設定的輕量級雲端儲存 API (負責跨設備同步)
-    const CLOUD_BIN_ID = "nuannuan-care-sync-v1";
-    const CLOUD_DATA_URL = `https://kvdb.io/${CLOUD_BIN_ID}/site_content`;
-    const CLOUD_STATS_URL = `https://kvdb.io/${CLOUD_BIN_ID}/site_stats`;
-
     const fullBrandName = "暖暖有限公司附設彰化縣私立暖暖居家長照機構";
     const lineUrl = "https://line.me/ti/p/@957jphho";
     const recruitLineUrl = "https://line.me/ti/p/~nuannuanhomecare";
@@ -165,7 +173,6 @@
     
     const PHOTO_CATEGORIES = ['溫馨照顧陪伴', '專業團隊', '社區活動交流'];
 
-    // 初始預設資料
     const initialServiceAreas = ['大城鄉', '芳苑鄉', '二林鎮', '竹塘鄉', '埤頭鄉', '員林市', '埔心鄉', '溪湖鎮', '永靖鄉', '社頭鄉', '彰化市', '花壇鄉', '大村鄉'];
 
     const levelData = {
@@ -327,8 +334,8 @@
 
     // --- 子頁面組件 ---
 
-    // 💡 後台管理組件 (整合輕量雲端 KVDB 即時數據)
-    const AdminPage = ({ stats, loadingStats, newsData, setNewsData, photoData, setPhotoData, serviceAreas, setServiceAreas, faqData, setFaqData, isPhotoLoading, syncDrivePhotos, togglePublishPhoto, onLogout }) => {
+    // 💡 後台管理組件 (整合 Firebase 即時數據)
+    const AdminPage = ({ fb, stats, loadingStats, newsData, setNewsData, photoData, setPhotoData, serviceAreas, setServiceAreas, faqData, setFaqData, isPhotoLoading, syncDrivePhotos, togglePublishPhoto, onLogout }) => {
       const [adminTab, setAdminTab] = useState('dashboard');
       
       const [newNewsTitle, setNewNewsTitle] = useState('');
@@ -473,19 +480,19 @@
                         <div className="bg-stone-50 p-6 rounded-3xl border border-stone-100 shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
                           <p className="text-stone-400 font-bold text-sm relative z-10">本月網站瀏覽人次</p>
                           <h4 className="text-4xl font-black text-gray-800 mt-2 relative z-10">{loadingStats ? '...' : (stats.pageViews || 0).toLocaleString()}</h4>
-                          <p className="text-green-500 text-xs font-black mt-2 relative z-10">即時雲端追蹤中</p>
+                          <p className="text-green-500 text-xs font-black mt-2 relative z-10">即時追蹤中</p>
                           {loadingStats && <div className="absolute inset-0 bg-stone-100 animate-pulse"></div>}
                         </div>
                         <div className="bg-stone-50 p-6 rounded-3xl border border-stone-100 shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
                           <p className="text-stone-400 font-bold text-sm relative z-10">費用試算使用次數</p>
                           <h4 className="text-4xl font-black text-gray-800 mt-2 relative z-10">{loadingStats ? '...' : (stats.calcUses || 0).toLocaleString()}</h4>
-                          <p className="text-green-500 text-xs font-black mt-2 relative z-10">即時雲端追蹤中</p>
+                          <p className="text-green-500 text-xs font-black mt-2 relative z-10">即時追蹤中</p>
                           {loadingStats && <div className="absolute inset-0 bg-stone-100 animate-pulse"></div>}
                         </div>
                         <div className="bg-stone-50 p-6 rounded-3xl border border-stone-100 shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
                           <p className="text-stone-400 font-bold text-sm relative z-10">LINE 點擊諮詢數</p>
                           <h4 className="text-4xl font-black text-gray-800 mt-2 relative z-10">{loadingStats ? '...' : (stats.lineClicks || 0).toLocaleString()}</h4>
-                          <p className="text-orange-500 text-xs font-black mt-2 relative z-10">即時雲端追蹤中</p>
+                          <p className="text-orange-500 text-xs font-black mt-2 relative z-10">即時追蹤中</p>
                           {loadingStats && <div className="absolute inset-0 bg-stone-100 animate-pulse"></div>}
                         </div>
                       </div>
@@ -912,7 +919,7 @@
                       在彰化大城的海風中，「暖暖居家」因一個初心而生：讓偏鄉長輩在最熟悉的老屋裡，享有如家人般的溫潤照護。
                     </p>
                     <p>
-                      我們由專業社工師團隊親自督導。走訪過無數家庭後，我們決定化作一道永不落下的陽光，照進每一個需要陪伴的角落。
+                      我們由專業社工師團隊親自督導。走訪過無數家庭後，我們決定化作一道永不落下的陽光，照進每一個全面需要陪伴的角落。
                     </p>
                     <p className="text-orange-600 font-black">
                       因為我們深信：最好的照護不只是專業的醫護，更是一份帶著溫度的生命守候。
@@ -1621,14 +1628,20 @@
 
       const [isAdmin, setIsAdmin] = useState(false);
       const [showLoginModal, setShowLoginModal] = useState(false);
-      const [adminPassword, setAdminPassword] = useState('');
       const [loginError, setLoginError] = useState('');
+      const [fbAuthInstance, setFbAuthInstance] = useState(null);
+
+      // ==========================================
+      // 💡 請在這裡填寫「有權限進入後台的 Google 信箱」
+      // ==========================================
+      const ALLOWED_ADMIN_EMAILS = [
+        'dick19921014@gmail.com'
+      ];
 
       const [isPhotoLoading, setIsPhotoLoading] = useState(false);
       const [stats, setStats] = useState({ pageViews: 0, calcUses: 0, lineClicks: 0 });
       const [loadingStats, setLoadingStats] = useState(true);
       
-      // 💡 雙層緩存機制 (優先抓取最新 localStorage，並準備覆寫雲端)
       const [newsData, setNewsData] = useState(() => {
         const saved = localStorage.getItem('nuannuan_news_db');
         return saved ? JSON.parse(saved) : initialNewsList;
@@ -1646,83 +1659,187 @@
         return saved ? JSON.parse(saved) : initialFaqData;
       });
 
-      // 💡 免設定公用 API 網址
-      const CLOUD_BASE_ID = "nuannuan-care-sync-v1";
-      const DATA_API_URL = `https://kvdb.io/${CLOUD_BASE_ID}/site_content`;
-      const STATS_API_URL = `https://kvdb.io/${CLOUD_BASE_ID}/site_stats`;
+      // ==========================================
+      // 💡 Firebase 金鑰
+      // ==========================================
+      const MY_FIREBASE_CONFIG = {
+        apiKey: "AIzaSyAedXdcekXTC-vzybidtSvoOY91k9sreAU",
+        authDomain: "nuannuan-5ee91.firebaseapp.com",
+        projectId: "nuannuan-5ee91",
+        storageBucket: "nuannuan-5ee91.firebasestorage.app",
+        messagingSenderId: "961966504941",
+        appId: "1:961966504941:web:2687b9b57293d025ca85e4",
+        measurementId: "G-WWBZZE9XHL"
+      };
 
-      // 💡 寫入公用雲端
-      const syncToCloud = (news, photos, areas, faqs) => {
-        const payload = { newsData: news, photoData: photos, serviceAreas: areas, faqData: faqs };
-        fetch(DATA_API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        }).catch(err => console.error('Cloud Sync Error', err));
+      const [fb, setFb] = useState(null);
+      // 脫離環境時使用固定的 APP ID 以維持資料讀寫路徑一致
+      const APP_DOC_ID = 'nuannuan_official_web';
+
+      // 💡 Firebase 初始化與驗證設定 (使用原生 import 避開 Babel 的 require 編譯錯誤)
+      useEffect(() => {
+        let unsubscribeAuth;
+        const initFb = () => {
+          try {
+            if (!window.FirebaseModules) return; 
+
+            let firebaseConfig = null;
+            if (MY_FIREBASE_CONFIG.apiKey && !MY_FIREBASE_CONFIG.apiKey.includes("請貼上")) {
+               firebaseConfig = MY_FIREBASE_CONFIG;
+            } else if (typeof __firebase_config !== 'undefined') {
+               firebaseConfig = JSON.parse(__firebase_config);
+            } else {
+               console.warn("⚠️ 偵測到外部環境，且未設定 Firebase。系統將切換至單機模式。");
+               return; 
+            }
+
+            const { initializeApp, getAuth, signInAnonymously, onAuthStateChanged, getFirestore, doc, setDoc, updateDoc, increment, onSnapshot, collection } = window.FirebaseModules;
+
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+            
+            setFbAuthInstance(auth);
+
+            // 優先嘗試匿名登入以確保可以寫入流量追蹤數據
+            signInAnonymously(auth).then(() => {
+                unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+                  if (user) {
+                    setFb({ db, user, increment, doc, setDoc, updateDoc, onSnapshot, collection });
+                    
+                    // 驗證登入信箱是否在白名單中
+                    if (user.email && ALLOWED_ADMIN_EMAILS.includes(user.email)) {
+                       setIsAdmin(true);
+                    } else {
+                       setIsAdmin(false);
+                    }
+                  } else {
+                     setIsAdmin(false);
+                  }
+                });
+            }).catch(err => {
+                console.warn('Auth Error: 系統嘗試作為訪客連線被拒絕，請確認已在 Firebase Authentication 開啟「匿名登入」功能。', err.message);
+                setLoadingStats(false);
+            });
+
+          } catch (err) {
+            console.error('Firebase Init Error:', err);
+            setLoadingStats(false);
+          }
+        };
+
+        if (window.FirebaseModules) {
+          initFb();
+        } else {
+          window.addEventListener('firebase-modules-loaded', initFb);
+        }
+
+        return () => { 
+          if(unsubscribeAuth) unsubscribeAuth(); 
+          window.removeEventListener('firebase-modules-loaded', initFb);
+        };
+      }, []);
+
+      // 💡 雲端內容即時同步 (加上 try catch 錯誤捕捉)
+      useEffect(() => {
+        if (!fb || !fb.user) return;
+        const contentDocRef = fb.doc(fb.db, 'artifacts', APP_DOC_ID, 'public', 'data', 'siteContent', 'main');
+
+        const unsubscribe = fb.onSnapshot(contentDocRef, (snap) => {
+           if (snap.exists()) {
+              const data = snap.data();
+              if (data.newsData) { setNewsData(data.newsData); localStorage.setItem('nuannuan_news_db', JSON.stringify(data.newsData)); }
+              if (data.photoData) { setPhotoData(data.photoData); localStorage.setItem('nuannuan_photos_db', JSON.stringify(data.photoData)); }
+              if (data.serviceAreas) { setServiceAreas(data.serviceAreas); localStorage.setItem('nuannuan_areas_db', JSON.stringify(data.serviceAreas)); }
+              if (data.faqData) { setFaqData(data.faqData); localStorage.setItem('nuannuan_faq_db', JSON.stringify(data.faqData)); }
+           } else {
+              // 只有管理員才嘗試初始化遠端資料，避免訪客權限不足跳出紅字錯誤
+              if (fb.user.email && ALLOWED_ADMIN_EMAILS.includes(fb.user.email)) {
+                 fb.setDoc(contentDocRef, {
+                    newsData: JSON.parse(localStorage.getItem('nuannuan_news_db')) || initialNewsList,
+                    photoData: JSON.parse(localStorage.getItem('nuannuan_photos_db')) || initialPhotoList,
+                    serviceAreas: JSON.parse(localStorage.getItem('nuannuan_areas_db')) || initialServiceAreas,
+                    faqData: JSON.parse(localStorage.getItem('nuannuan_faq_db')) || initialFaqData
+                 }).catch(err => console.warn("無法初始化雲端內容 (資料庫規則可能未開放寫入)：", err.message));
+              }
+           }
+        }, (err) => {
+           console.warn("無法即時連線雲端內容 (規則可能未開放讀取)，將自動切換為本地端運作：", err.message);
+        });
+
+        return () => unsubscribe();
+      }, [fb]);
+
+      // 💡 Firebase 追蹤器與即時數據拉取 (加上 try catch 錯誤捕捉)
+      useEffect(() => {
+        if (fb) {
+          trackEventRef.current = (eventName) => {
+            const docId = `${new Date().getFullYear()}_${new Date().getMonth() + 1}`;
+            const docRef = fb.doc(fb.db, 'artifacts', APP_DOC_ID, 'public', 'data', 'stats', docId);
+            
+            fb.updateDoc(docRef, { [eventName]: fb.increment(1) }).catch(e => {
+               if (e.code === 'not-found') {
+                  fb.setDoc(docRef, { pageViews: 0, calcUses: 0, lineClicks: 0, [eventName]: 1 }, { merge: true })
+                    .catch(err => console.warn("無法建立流量統計 (資料庫規則未開放)：", err.message));
+               } else {
+                  console.warn("流量統計更新被拒 (資料庫規則未開放)：", e.message);
+               }
+            });
+          };
+          
+          // 僅針對管理員介面載入時監聽最新數據，一般訪客不需要這個連線
+          const docId = `${new Date().getFullYear()}_${new Date().getMonth() + 1}`;
+          const statsDocRef = fb.doc(fb.db, 'artifacts', APP_DOC_ID, 'public', 'data', 'stats', docId);
+          
+          let unsubStats = () => {};
+          
+          if (fb.user && fb.user.email && ALLOWED_ADMIN_EMAILS.includes(fb.user.email)) {
+             unsubStats = fb.onSnapshot(statsDocRef, (snap) => {
+                if (snap.exists()) setStats(snap.data());
+                setLoadingStats(false);
+             }, (err) => {
+                console.warn("無法讀取流量統計：", err.message);
+                setLoadingStats(false);
+             });
+          } else {
+             setLoadingStats(false);
+          }
+
+          if (!window.__trackedPv) {
+            window.__trackedPv = true;
+            setTimeout(() => { if (trackEventRef.current) trackEventRef.current('pageViews'); }, 1000);
+          }
+
+          return () => unsubStats();
+        }
+      }, [fb]);
+
+      const syncToCloud = (key, data) => {
+        if (!fb || !fb.user) return;
+        const contentDocRef = fb.doc(fb.db, 'artifacts', APP_DOC_ID, 'public', 'data', 'siteContent', 'main');
+        fb.setDoc(contentDocRef, { [key]: data }, { merge: true }).catch(err => console.warn(`更新資料庫時被拒 (${key})：`, err.message));
       };
 
       const updateNewsData = (newData) => { 
           setNewsData(newData); 
           localStorage.setItem('nuannuan_news_db', JSON.stringify(newData));
-          syncToCloud(newData, photoData, serviceAreas, faqData); 
+          syncToCloud('newsData', newData); 
       };
       const updatePhotoData = (newData) => { 
           setPhotoData(newData); 
           localStorage.setItem('nuannuan_photos_db', JSON.stringify(newData));
-          syncToCloud(newsData, newData, serviceAreas, faqData); 
+          syncToCloud('photoData', newData); 
       };
       const updateServiceAreas = (newData) => { 
           setServiceAreas(newData); 
           localStorage.setItem('nuannuan_areas_db', JSON.stringify(newData));
-          syncToCloud(newsData, photoData, newData, faqData); 
+          syncToCloud('serviceAreas', newData); 
       };
       const updateFaqData = (newData) => { 
           setFaqData(newData); 
           localStorage.setItem('nuannuan_faq_db', JSON.stringify(newData));
-          syncToCloud(newsData, photoData, serviceAreas, newData); 
+          syncToCloud('faqData', newData); 
       };
-
-      // 💡 載入公用雲端資料與數據 (加入 ?nocache=時間戳 解決手機端快取不更新的問題)
-      useEffect(() => {
-         // 抓取網站內容
-         fetch(`${DATA_API_URL}?nocache=${new Date().getTime()}`, { cache: 'no-store' })
-            .then(res => { if(res.ok) return res.json(); throw new Error('Cloud Empty'); })
-            .then(data => {
-                if (data.newsData) { setNewsData(data.newsData); localStorage.setItem('nuannuan_news_db', JSON.stringify(data.newsData)); }
-                if (data.photoData) { setPhotoData(data.photoData); localStorage.setItem('nuannuan_photos_db', JSON.stringify(data.photoData)); }
-                if (data.serviceAreas) { setServiceAreas(data.serviceAreas); localStorage.setItem('nuannuan_areas_db', JSON.stringify(data.serviceAreas)); }
-                if (data.faqData) { setFaqData(data.faqData); localStorage.setItem('nuannuan_faq_db', JSON.stringify(data.faqData)); }
-            })
-            .catch(() => {
-                // 如果雲端為空，則把目前本機的最新資料上傳作為基準
-                syncToCloud(newsData, photoData, serviceAreas, faqData);
-            });
-
-         // 抓取流量數據
-         fetch(`${STATS_API_URL}?nocache=${new Date().getTime()}`, { cache: 'no-store' })
-            .then(res => { if(res.ok) return res.json(); throw new Error('Stats Empty'); })
-            .then(data => { setStats(data); setLoadingStats(false); })
-            .catch(() => { setLoadingStats(false); });
-      }, []);
-
-      // 💡 流量追蹤器
-      useEffect(() => {
-        trackEventRef.current = (eventName) => {
-           fetch(`${STATS_API_URL}?nocache=${new Date().getTime()}`, { cache: 'no-store' })
-              .then(res => res.ok ? res.json() : { pageViews: 0, calcUses: 0, lineClicks: 0 })
-              .then(currentStats => {
-                 const newStats = { ...currentStats, [eventName]: (currentStats[eventName] || 0) + 1 };
-                 fetch(STATS_API_URL, { method: 'POST', body: JSON.stringify(newStats) });
-                 setStats(newStats); 
-              }).catch(e => console.error(e));
-        };
-        
-        if (!window.__trackedPv) {
-          window.__trackedPv = true;
-          // 延遲 1 秒發送，確保雲端有反應時間
-          setTimeout(() => { if (trackEventRef.current) trackEventRef.current('pageViews'); }, 1000);
-        }
-      }, []);
 
       const [isMenuOpen, setIsMenuOpen] = useState(false);
       const [scrolled, setScrolled] = useState(false);
@@ -1868,27 +1985,56 @@
           return;
         }
         setShowLoginModal(true);
-        setAdminPassword('');
         setLoginError('');
       };
 
-      const handleLoginSubmit = (e) => {
-        e.preventDefault();
-        if (adminPassword === "1542") {
-          setIsAdmin(true);
-          setShowLoginModal(false);
-          navigate('admin');
-        } else {
-          setLoginError('密碼錯誤，請重新輸入。');
-          setAdminPassword('');
+      // 💡 Google 登入處理邏輯
+      const handleGoogleLogin = () => {
+        if (!fbAuthInstance || !window.FirebaseModules) {
+           setLoginError("系統尚未連線完畢，請稍後再試。");
+           return;
         }
+        
+        setLoginError("");
+        const provider = new window.FirebaseModules.GoogleAuthProvider();
+        
+        window.FirebaseModules.signInWithPopup(fbAuthInstance, provider)
+          .then((result) => {
+            const user = result.user;
+            if (ALLOWED_ADMIN_EMAILS.includes(user.email)) {
+               setIsAdmin(true);
+               setShowLoginModal(false);
+               navigate('admin');
+            } else {
+               setLoginError(`帳號 ${user.email} 無後台訪問權限。`);
+               // 無權限者自動登出其 Google 帳號，並退回匿名身份維持數據追蹤
+               window.FirebaseModules.signOut(fbAuthInstance).then(() => {
+                  window.FirebaseModules.signInAnonymously(fbAuthInstance);
+               });
+            }
+          }).catch((error) => {
+            console.error("Google Login Error:", error);
+            setLoginError("登入被取消或發生錯誤。");
+          });
+      };
+
+      // 💡 安全登出邏輯
+      const handleSafeLogout = () => {
+         if (fbAuthInstance && window.FirebaseModules) {
+            window.FirebaseModules.signOut(fbAuthInstance).then(() => {
+               window.FirebaseModules.signInAnonymously(fbAuthInstance);
+            });
+         }
+         setIsAdmin(false);
+         navigate('home');
       };
 
       return (
         <div className="min-h-screen flex flex-col overflow-x-hidden">
           <nav className={`fixed w-full z-[100] transition-all duration-500 ${scrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-8'}`}>
             <div className="max-w-[1500px] mx-auto px-6 md:px-8 flex justify-between items-center">
-              {/* 💡 修正：移除 hidden sm:flex，讓標題在手機版正常顯示，並設定最大寬度防跑版 */}
+              
+              {/* 💡 讓標題在手機版正常顯示，並設定最大寬度防跑版 */}
               <div className="flex items-center gap-2 md:gap-4 cursor-pointer group shrink-0" onClick={() => navigate('home')}>
                 <div className="bg-orange-500 p-2 md:p-2.5 rounded-2xl text-white shadow-2xl animate-sun group-hover:rotate-12 transition duration-300 shrink-0">
                   <Sun size={28} className="md:w-8 md:h-8" />
@@ -1948,6 +2094,7 @@
 
             {currentPage === 'admin' && isAdmin && (
               <AdminPage 
+                fb={fb}
                 stats={stats}
                 loadingStats={loadingStats}
                 newsData={newsData} 
@@ -1961,7 +2108,7 @@
                 isPhotoLoading={isPhotoLoading}
                 syncDrivePhotos={syncDrivePhotos}
                 togglePublishPhoto={togglePublishPhoto}
-                onLogout={() => { setIsAdmin(false); navigate('home'); }} 
+                onLogout={handleSafeLogout} 
               />
             )}
             
@@ -2057,39 +2204,25 @@
           {showLoginModal && (
             <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4 animate-page">
               <div className="bg-white rounded-[40px] p-10 max-w-sm w-full shadow-2xl text-center relative">
+                <button onClick={() => setShowLoginModal(false)} className="absolute top-6 right-6 text-stone-400 hover:text-stone-700">
+                  <X size={24} />
+                </button>
                 <div className="bg-orange-100 text-orange-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Lock size={32} />
                 </div>
                 <h3 className="text-2xl font-black text-gray-800 mb-2">系統管理登入</h3>
-                <p className="text-stone-500 text-sm font-bold mb-8">請輸入管理員專屬密碼</p>
+                <p className="text-stone-500 text-sm font-bold mb-8">請使用受權限保護的 Google 帳號登入</p>
                 
-                <form onSubmit={handleLoginSubmit}>
-                  <input 
-                    type="password" 
-                    value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
-                    className="w-full text-center text-2xl tracking-[0.5em] font-black p-4 bg-stone-50 border-2 border-stone-100 rounded-2xl focus:border-orange-500 focus:bg-white outline-none transition-all mb-4"
-                    placeholder="••••"
-                    autoFocus
-                  />
-                  {loginError && <p className="text-red-500 text-sm font-black mb-4">{loginError}</p>}
-                  
-                  <div className="flex gap-4">
-                    <button 
-                      type="button" 
-                      onClick={() => setShowLoginModal(false)}
-                      className="flex-1 py-4 rounded-2xl font-black text-stone-500 bg-stone-100 hover:bg-stone-200 transition-colors"
-                    >
-                      取消
-                    </button>
-                    <button 
-                      type="submit"
-                      className="flex-1 py-4 rounded-2xl font-black text-white bg-orange-500 shadow-lg shadow-orange-500/30 hover:scale-105 active:scale-95 transition-all"
-                    >
-                      登入
-                    </button>
-                  </div>
-                </form>
+                {loginError && <div className="bg-red-50 text-red-500 text-xs font-black p-3 rounded-xl mb-6">{loginError}</div>}
+                
+                <button 
+                  onClick={handleGoogleLogin}
+                  className="w-full flex items-center justify-center gap-3 bg-white border-2 border-stone-200 text-stone-700 py-4 rounded-2xl font-black shadow-sm hover:border-orange-500 hover:bg-orange-50 hover:text-orange-600 transition-all active:scale-95 mb-4"
+                >
+                  <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/><path d="M1 1h22v22H1z" fill="none"/></svg>
+                  使用 Google 帳號登入
+                </button>
+                <p className="text-[10px] text-stone-400 font-bold tracking-widest mt-6">NUAN NUAN SECURE LOGIN</p>
               </div>
             </div>
           )}
