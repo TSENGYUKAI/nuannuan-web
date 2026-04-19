@@ -1673,10 +1673,9 @@
       };
 
       const [fb, setFb] = useState(null);
-      // 脫離環境時使用固定的 APP ID 以維持資料讀寫路徑一致
       const APP_DOC_ID = 'nuannuan_official_web';
 
-      // 💡 Firebase 初始化與驗證設定 (使用原生 import 避開 Babel 的 require 編譯錯誤)
+      // 💡 Firebase 初始化與驗證設定
       useEffect(() => {
         let unsubscribeAuth;
         const initFb = () => {
@@ -1701,13 +1700,11 @@
             
             setFbAuthInstance(auth);
 
-            // 優先嘗試匿名登入以確保可以寫入流量追蹤數據
             signInAnonymously(auth).then(() => {
                 unsubscribeAuth = onAuthStateChanged(auth, (user) => {
                   if (user) {
                     setFb({ db, user, increment, doc, setDoc, updateDoc, onSnapshot, collection });
                     
-                    // 驗證登入信箱是否在白名單中
                     if (user.email && ALLOWED_ADMIN_EMAILS.includes(user.email)) {
                        setIsAdmin(true);
                     } else {
@@ -1740,7 +1737,7 @@
         };
       }, []);
 
-      // 💡 雲端內容即時同步 (加上 try catch 錯誤捕捉)
+      // 💡 雲端內容即時同步
       useEffect(() => {
         if (!fb || !fb.user) return;
         const contentDocRef = fb.doc(fb.db, 'artifacts', APP_DOC_ID, 'public', 'data', 'siteContent', 'main');
@@ -1753,7 +1750,6 @@
               if (data.serviceAreas) { setServiceAreas(data.serviceAreas); localStorage.setItem('nuannuan_areas_db', JSON.stringify(data.serviceAreas)); }
               if (data.faqData) { setFaqData(data.faqData); localStorage.setItem('nuannuan_faq_db', JSON.stringify(data.faqData)); }
            } else {
-              // 只有管理員才嘗試初始化遠端資料，避免訪客權限不足跳出紅字錯誤
               if (fb.user.email && ALLOWED_ADMIN_EMAILS.includes(fb.user.email)) {
                  fb.setDoc(contentDocRef, {
                     newsData: JSON.parse(localStorage.getItem('nuannuan_news_db')) || initialNewsList,
@@ -1770,7 +1766,7 @@
         return () => unsubscribe();
       }, [fb]);
 
-      // 💡 Firebase 追蹤器與即時數據拉取 (加上 try catch 錯誤捕捉)
+      // 💡 Firebase 追蹤器與即時數據拉取
       useEffect(() => {
         if (fb) {
           trackEventRef.current = (eventName) => {
@@ -1787,7 +1783,6 @@
             });
           };
           
-          // 僅針對管理員介面載入時監聽最新數據，一般訪客不需要這個連線
           const docId = `${new Date().getFullYear()}_${new Date().getMonth() + 1}`;
           const statsDocRef = fb.doc(fb.db, 'artifacts', APP_DOC_ID, 'public', 'data', 'stats', docId);
           
@@ -2014,7 +2009,13 @@
             }
           }).catch((error) => {
             console.error("Google Login Error:", error);
-            setLoginError("登入被取消或發生錯誤。");
+            if (error.code === 'auth/unauthorized-domain') {
+               setLoginError("【網域未授權】請至 Firebase Authentication 的「設定 > 授權網域」加入您目前的網址。");
+            } else if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
+               setLoginError("【視窗被阻擋或關閉】請確認瀏覽器未阻擋彈出視窗，並請重試。");
+            } else {
+               setLoginError(`登入失敗：${error.message}`);
+            }
           });
       };
 
@@ -2115,7 +2116,7 @@
             {currentPage === 'privacy' && <PolicyPage 
               title="隱私權保護政策" 
               icon={<Lock size={36} />}
-              content={`歡迎您造訪「暖暖居家長照機構官方網站」（以下簡稱本網站），為了讓您能夠安心的使用本網站的各項服務與資訊，特此向您說明本網站的隱私權保護政策，以保障您的權益，請您詳閱下列內容：\n\n一、隱私權保護政策的適用範圍\n隱私權保護政策內容，包括本網站如何處理在您使用網站服務時收集到的個人識別資料。隱私權保護政策不適用於本網站以外的相關連結網站，也不適用於非本網站所委託 or 參與管理的人員。\n\n二、個人資料的蒐集、處理及利用方式\n• 當您造訪本網站或使用本網站所提供之功能服務時，我們將視該服務功能性質，請您提供必要的個人資料，並在該特定目的範圍內處理及利用您的個人資料；非經您書面同意，本網站不會將個人資料用於其他用途。\n• 本網站在您使用線上試算、客服信箱、問卷調查等互動性功能時，會保留您所提供的姓名、電子郵件地址、聯絡方式及使用時間等。\n• 於一般瀏覽時，伺服器會自行記錄相關行徑，包括您使用連線設備的IP位址、使用時間、使用的瀏覽器、瀏覽及點選資料記錄等，做為我們增進網站服務的參考依據，此記錄為內部應用，決不對外公佈。\n\n三、資料之保護\n本網站主機均設有防火牆、防毒系統等相關的各項資訊安全設備及必要的安全防護措施，加以保護網站及您的個人資料採用嚴格的保護措施，只由經過授權的人員才能接觸您的個人資料，相關處理人員皆簽有保密合約，如有違反保密義務者，將受相關法律處分。\n\n四、網站對外的相關連結\n本網站的網頁提供其他網站的網路連結，您也可經由本網站所提供的連結，點選進入其他網站。但該連結網站不適用本網站的隱私權保護政策，您必須參考該連結網站中的隱私權保護政策。\n\n五、隱私權保護政策之修正\n本網站隱私權保護政策將因應需求隨時進行修正，修正後的條款將刊登於網站上。`} 
+              content={`歡迎您造訪「暖暖居家長照機構官方網站」（以下簡稱本網站），為了讓您能夠安心的使用本網站的各項服務與資訊，特此向您說明本網站的隱私權保護政策，以保障您的權益，請您詳閱下列內容：\n\n一、隱私權保護政策的適用範圍\n隱私權保護政策內容，包括本網站如何處理在您使用網站服務時收集到的個人識別資料。隱私權保護政策不適用於本網站以外的相關連結網站，也不適用於非本網站所委託 or 參與管理的人員。\n\n二、個人資料的蒐集、處理及利用方式\n• 當您造訪本網站或使用本網站所提供之功能服務時，我們將視該服務功能性質，請您提供必要的個人資料，並在該特定目的範圍內處理及利用您的個人資料；非經您書面同意，本網站不會將個人資料用於其他用途。\n• 本網站在您使用線上試算、客服信箱、問卷調查等互動性功能時，會保留您所提供的姓名、電子郵件地址、聯絡方式及使用時間等。\n• 於一般瀏覽時，伺服器會自行記錄相關行徑，console包括您使用連線設備的IP位址、使用時間、使用的瀏覽器、瀏覽及點選資料記錄等，做為我們增進網站服務的參考依據，此記錄為內部應用，決不對外公佈。\n\n三、資料之保護\n本網站主機均設有防火牆、防毒系統等相關的各項資訊安全設備及必要的安全防護措施，加以保護網站及您的個人資料採用嚴格的保護措施，只由經過授權的人員才能接觸您的個人資料，相關處理人員皆簽有保密合約，如有違反保密義務者，將受相關法律處分。\n\n四、網站對外的相關連結\n本網站的網頁提供其他網站的網路連結，您也可經由本網站所提供的連結，點選進入其他網站。但該連結網站不適用本網站的隱私權保護政策，您必須參考該連結網站中的隱私權保護政策。\n\n五、隱私權保護政策之修正\n本網站隱私權保護政策將因應需求隨時進行修正，修正後的條款將刊登於網站上。`} 
             />}
             {currentPage === 'security' && <PolicyPage 
               title="資訊安全政策" 
@@ -2201,6 +2202,7 @@
             </a>
           </div>
 
+          {/* 💡 更新後的 Google 登入彈窗 */}
           {showLoginModal && (
             <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[300] flex items-center justify-center p-4 animate-page">
               <div className="bg-white rounded-[40px] p-10 max-w-sm w-full shadow-2xl text-center relative">
