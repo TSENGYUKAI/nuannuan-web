@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <base target="_top">
@@ -144,7 +144,21 @@
     </div>
   </div>
 
-  <script type="text/babel">
+  <!-- 💡 繞過 Babel 解析的 Firebase 原生模組載入器 -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+    import { getFirestore, doc, setDoc, updateDoc, increment, onSnapshot, collection } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+    window.FirebaseModules = {
+      initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged,
+      getFirestore, doc, setDoc, updateDoc, increment, onSnapshot, collection
+    };
+    window.dispatchEvent(new Event('firebase-modules-loaded'));
+  </script>
+
+  <!-- 💡 使用 data-presets="react" 避免 Babel 轉譯 async/await 產生 require 錯誤 -->
+  <script type="text/babel" data-presets="react">
     const { useState, useEffect, useMemo, useRef } = React;
     
     // ==========================================
@@ -322,7 +336,7 @@
 
     // --- 子頁面組件 ---
 
-    // 💡 後台管理組件 (整合 Firebase 即時數據)
+    // 💡 後台管理組件 (整合 Firebase 即時數據與修正高度限制)
     const AdminPage = ({ fb, newsData, setNewsData, photoData, setPhotoData, serviceAreas, setServiceAreas, faqData, setFaqData, isPhotoLoading, syncDrivePhotos, togglePublishPhoto, onLogout }) => {
       const [adminTab, setAdminTab] = useState('dashboard');
       
@@ -509,8 +523,9 @@
                         </div>
                       </div>
 
-                      <div className="bg-stone-50 p-6 md:p-8 rounded-3xl border border-stone-100 shadow-sm min-h-[500px] flex flex-col relative overflow-hidden group">
-                        <div className="flex justify-between items-center mb-6">
+                      {/* 💡 修改：修正高度設定，避免修改報表來源時跑版 */}
+                      <div className="bg-stone-50 p-6 md:p-8 rounded-3xl border border-stone-100 shadow-sm h-[550px] flex flex-col relative overflow-hidden group">
+                        <div className="flex justify-between items-center mb-6 shrink-0">
                            <h4 className="font-black text-gray-800 flex items-center gap-2">
                              <BarChart size={20} className="text-orange-500"/> GA4 網站流量即時報表
                            </h4>
@@ -520,13 +535,13 @@
                         </div>
 
                         {isEditingLooker || !lookerUrl ? (
-                           <div className="flex-1 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-stone-200 rounded-2xl bg-white relative z-10">
-                               <Cloud size={48} className="text-stone-300 mb-4" />
-                               <p className="text-stone-600 font-black text-lg mb-2">設定 Google Looker Studio 報表</p>
-                               <p className="text-stone-400 text-xs font-bold mb-6 max-w-md leading-relaxed">
+                           <div className="flex-1 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-stone-200 rounded-2xl bg-white relative z-10 overflow-y-auto">
+                               <Cloud size={48} className="text-stone-300 mb-4 shrink-0" />
+                               <p className="text-stone-600 font-black text-lg mb-2 shrink-0">設定 Google Looker Studio 報表</p>
+                               <p className="text-stone-400 text-xs font-bold mb-6 max-w-md leading-relaxed shrink-0">
                                   請前往 Looker Studio 建立 GA4 報表，取得「嵌入報表」的網址，貼在下方即可直接在後台查看流量圖表。
                                </p>
-                               <div className="w-full max-w-lg flex flex-col sm:flex-row gap-3">
+                               <div className="w-full max-w-lg flex flex-col sm:flex-row gap-3 shrink-0">
                                    <input 
                                      type="text" 
                                      value={tempLookerUrl} 
@@ -536,7 +551,7 @@
                                    />
                                    <button onClick={handleSaveLookerUrl} className="bg-orange-500 text-white px-6 py-3 rounded-xl font-black text-sm hover:bg-orange-600 transition-colors shadow-md">儲存顯示</button>
                                </div>
-                               {lookerUrl && <button onClick={() => { setIsEditingLooker(false); setTempLookerUrl(lookerUrl); }} className="mt-4 text-xs text-stone-400 font-bold hover:text-stone-600">取消編輯</button>}
+                               {lookerUrl && <button onClick={() => { setIsEditingLooker(false); setTempLookerUrl(lookerUrl); }} className="mt-4 text-xs text-stone-400 font-bold hover:text-stone-600 shrink-0">取消編輯</button>}
                            </div>
                         ) : (
                            <div className="flex-1 rounded-2xl overflow-hidden border border-stone-200 bg-white w-full h-full relative z-10">
@@ -545,7 +560,7 @@
                                 height="100%" 
                                 src={lookerUrl} 
                                 frameBorder="0" 
-                                style={{ border: 0, minHeight: '400px' }} 
+                                style={{ border: 0 }} 
                                 allowFullScreen 
                                 sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
                               ></iframe>
@@ -557,7 +572,6 @@
                   </div>
                 )}
 
-                {/* 其他 Tab 的內容與前版相同，省略避免版面過長，實際已包含於此 */}
                 {adminTab === 'news' && (
                   <div className="q-card p-8 md:p-12 animate-page">
                     <h3 className="text-2xl font-black text-gray-800 mb-8 flex items-center gap-3 border-b-2 border-orange-50 pb-4">
@@ -1491,12 +1505,11 @@
       const [submitSuccess, setSubmitSuccess] = useState(false);
       const [isSubmitting, setIsSubmitting] = useState(false);
 
-      const handleSubmit = async (e) => {
+      const handleSubmit = (e) => {
         e.preventDefault();
         setIsSubmitting(true);
         
-        try {
-          const response = await fetch("https://formspree.io/f/xykljdbr", {
+        fetch("https://formspree.io/f/xykljdbr", {
             method: "POST",
             headers: {
               'Accept': 'application/json',
@@ -1508,20 +1521,19 @@
                "居住區域": formData.area || "未填寫",
                "照服員資格": formData.exp === "yes" ? "已取得結業證明/相關科系" : "尚未取得資格"
             })
-          });
-
-          if (response.ok) {
-             setSubmitSuccess(true);
-             setFormData({ name: '', phone: '', area: '', exp: 'yes' });
-             setTimeout(() => setSubmitSuccess(false), 5000);
-          } else {
-             alert('送出失敗，請稍後再試。');
-          }
-        } catch (error) {
-           alert('網路錯誤，表單無法送出。');
-        } finally {
-           setIsSubmitting(false);
-        }
+        }).then(response => {
+            if (response.ok) {
+               setSubmitSuccess(true);
+               setFormData({ name: '', phone: '', area: '', exp: 'yes' });
+               setTimeout(() => setSubmitSuccess(false), 5000);
+            } else {
+               alert('送出失敗，請稍後再試。');
+            }
+        }).catch(error => {
+            alert('網路錯誤，表單無法送出。');
+        }).finally(() => {
+            setIsSubmitting(false);
+        });
       };
 
       return (
@@ -1650,26 +1662,53 @@
 
       const [isPhotoLoading, setIsPhotoLoading] = useState(false);
       
-      const [newsData, setNewsData] = useState(initialNewsList);
-      const [photoData, setPhotoData] = useState(initialPhotoList);
-      const [serviceAreas, setServiceAreas] = useState(initialServiceAreas);
-      const [faqData, setFaqData] = useState(initialFaqData);
+      // 💡 加入 localStorage 雙層緩存，確保重新整理瞬間抓取最新本地存檔，不跑版不遺原
+      const [newsData, setNewsData] = useState(() => {
+        const saved = localStorage.getItem('nuannuan_news_db');
+        return saved ? JSON.parse(saved) : initialNewsList;
+      });
+      const [photoData, setPhotoData] = useState(() => {
+        const saved = localStorage.getItem('nuannuan_photos_db');
+        return saved ? JSON.parse(saved) : initialPhotoList;
+      });
+      const [serviceAreas, setServiceAreas] = useState(() => {
+        const saved = localStorage.getItem('nuannuan_areas_db');
+        return saved ? JSON.parse(saved) : initialServiceAreas;
+      });
+      const [faqData, setFaqData] = useState(() => {
+        const saved = localStorage.getItem('nuannuan_faq_db');
+        return saved ? JSON.parse(saved) : initialFaqData;
+      });
 
-      const syncToCloud = async (key, data) => {
+      const syncToCloud = (key, data) => {
         if (!fb || !fb.user) return;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const contentDocRef = fb.doc(fb.db, 'artifacts', appId, 'public', 'data', 'siteContent', 'main');
-        try {
-           await fb.setDoc(contentDocRef, { [key]: data }, { merge: true });
-        } catch (err) {
+        fb.setDoc(contentDocRef, { [key]: data }, { merge: true }).catch(err => {
            console.error(`Error syncing ${key}`, err);
-        }
+        });
       };
 
-      const updateNewsData = (newData) => { setNewsData(newData); syncToCloud('newsData', newData); };
-      const updatePhotoData = (newData) => { setPhotoData(newData); syncToCloud('photoData', newData); };
-      const updateServiceAreas = (newData) => { setServiceAreas(newData); syncToCloud('serviceAreas', newData); };
-      const updateFaqData = (newData) => { setFaqData(newData); syncToCloud('faqData', newData); };
+      const updateNewsData = (newData) => { 
+          setNewsData(newData); 
+          localStorage.setItem('nuannuan_news_db', JSON.stringify(newData));
+          syncToCloud('newsData', newData); 
+      };
+      const updatePhotoData = (newData) => { 
+          setPhotoData(newData); 
+          localStorage.setItem('nuannuan_photos_db', JSON.stringify(newData));
+          syncToCloud('photoData', newData); 
+      };
+      const updateServiceAreas = (newData) => { 
+          setServiceAreas(newData); 
+          localStorage.setItem('nuannuan_areas_db', JSON.stringify(newData));
+          syncToCloud('serviceAreas', newData); 
+      };
+      const updateFaqData = (newData) => { 
+          setFaqData(newData); 
+          localStorage.setItem('nuannuan_faq_db', JSON.stringify(newData));
+          syncToCloud('faqData', newData); 
+      };
 
       const [isMenuOpen, setIsMenuOpen] = useState(false);
       const [scrolled, setScrolled] = useState(false);
@@ -1679,30 +1718,29 @@
       const [identity, setIdentity] = useState('16');
       const [quantities, setQuantities] = useState({});
 
-      // 💡 Firebase 初始化與驗證設定
+      // 💡 Firebase 初始化與驗證設定 (移除 async/await 改用 Promise .then，徹底修復 require 錯誤)
       useEffect(() => {
         let unsubscribeAuth;
-        const initFb = async () => {
+        const initFb = () => {
           try {
-            if (typeof __firebase_config === 'undefined') return; // 在外部環境不強制載入
-            
-            // 繞過 Babel 的 import 編譯
-            const nativeImport = new Function('url', 'return import(url)');
+            if (typeof __firebase_config === 'undefined' || !window.FirebaseModules) return; 
 
-            const { initializeApp } = await nativeImport('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js');
-            const { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } = await nativeImport('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
-            const { getFirestore, doc, setDoc, updateDoc, increment, onSnapshot, collection } = await nativeImport('https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js');
+            const { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, doc, setDoc, updateDoc, increment, onSnapshot, collection } = window.FirebaseModules;
 
             const firebaseConfig = JSON.parse(__firebase_config);
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
             const db = getFirestore(app);
 
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-              await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-              await signInAnonymously(auth);
-            }
+            const doAuth = () => {
+              if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                return signInWithCustomToken(auth, __initial_auth_token);
+              } else {
+                return signInAnonymously(auth);
+              }
+            };
+            
+            doAuth().catch(err => console.error('Auth Error:', err));
 
             unsubscribeAuth = onAuthStateChanged(auth, (user) => {
               if (user) {
@@ -1713,11 +1751,20 @@
             console.error('Firebase Init Error:', err);
           }
         };
-        initFb();
-        return () => { if(unsubscribeAuth) unsubscribeAuth(); };
+
+        if (window.FirebaseModules) {
+          initFb();
+        } else {
+          window.addEventListener('firebase-modules-loaded', initFb);
+        }
+
+        return () => { 
+          if(unsubscribeAuth) unsubscribeAuth(); 
+          window.removeEventListener('firebase-modules-loaded', initFb);
+        };
       }, []);
 
-      // 💡 雲端內容即時同步 (取代 LocalStorage 達成跨裝置同步)
+      // 💡 雲端內容即時同步 (結合 LocalStorage 達成極速與跨裝置同步)
       useEffect(() => {
         if (!fb || !fb.user) return;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -1726,10 +1773,10 @@
         const unsubscribe = fb.onSnapshot(contentDocRef, (snap) => {
            if (snap.exists()) {
               const data = snap.data();
-              if (data.newsData) setNewsData(data.newsData);
-              if (data.photoData) setPhotoData(data.photoData);
-              if (data.serviceAreas) setServiceAreas(data.serviceAreas);
-              if (data.faqData) setFaqData(data.faqData);
+              if (data.newsData) { setNewsData(data.newsData); localStorage.setItem('nuannuan_news_db', JSON.stringify(data.newsData)); }
+              if (data.photoData) { setPhotoData(data.photoData); localStorage.setItem('nuannuan_photos_db', JSON.stringify(data.photoData)); }
+              if (data.serviceAreas) { setServiceAreas(data.serviceAreas); localStorage.setItem('nuannuan_areas_db', JSON.stringify(data.serviceAreas)); }
+              if (data.faqData) { setFaqData(data.faqData); localStorage.setItem('nuannuan_faq_db', JSON.stringify(data.faqData)); }
            } else {
               // 首次使用，將預設資料寫入雲端
               fb.setDoc(contentDocRef, {
@@ -1747,17 +1794,16 @@
       // 💡 Firebase 追蹤器實作
       useEffect(() => {
         if (fb) {
-          trackEventRef.current = async (eventName) => {
+          trackEventRef.current = (eventName) => {
             const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
             const docId = `${new Date().getFullYear()}_${new Date().getMonth() + 1}`;
             const docRef = fb.doc(fb.db, 'artifacts', appId, 'public', 'data', 'stats', docId);
-            try {
-               await fb.updateDoc(docRef, { [eventName]: fb.increment(1) });
-            } catch(e) {
+            
+            fb.updateDoc(docRef, { [eventName]: fb.increment(1) }).catch(e => {
                if (e.code === 'not-found') {
-                  await fb.setDoc(docRef, { pageViews: 0, calcUses: 0, lineClicks: 0, [eventName]: 1 }, { merge: true });
+                  fb.setDoc(docRef, { pageViews: 0, calcUses: 0, lineClicks: 0, [eventName]: 1 }, { merge: true });
                }
-            }
+            });
           };
           
           // 若為初次載入，觸發網頁瀏覽追蹤
@@ -1786,62 +1832,64 @@
         }
       }, [currentPage]);
 
-      const syncDrivePhotos = async (isManual = false) => {
+      const syncDrivePhotos = (isManual = false) => {
         setIsPhotoLoading(true);
         if (!GAS_PHOTO_API_URL || GAS_PHOTO_API_URL.includes("在此處貼上")) {
             if(isManual) alert('請先於程式碼設定 GAS_PHOTO_API_URL');
             setIsPhotoLoading(false);
             return;
         }
-        try {
-            const response = await fetch(GAS_PHOTO_API_URL);
-            const driveData = await response.json();
-            
-            if (driveData && driveData.length > 0) {
-                setPhotoData(prev => {
-                    const newData = [...prev];
-                    let changed = false;
-                    let newCount = 0;
-                    
-                    driveData.forEach(driveItem => {
-                        let imgUrl = driveItem.url;
-                        if (imgUrl && imgUrl.includes('drive.google.com')) {
-                            const match = imgUrl.match(/[\/?&]id=([a-zA-Z0-9_-]+)/) || imgUrl.match(/file\/d\/([a-zA-Z0-9_-]+)/);
-                            if (match) imgUrl = `https://lh3.googleusercontent.com/d/${match[1]}`;
-                        }
+        
+        fetch(GAS_PHOTO_API_URL)
+            .then(response => response.json())
+            .then(driveData => {
+                if (driveData && driveData.length > 0) {
+                    setPhotoData(prev => {
+                        const newData = [...prev];
+                        let changed = false;
+                        let newCount = 0;
+                        
+                        driveData.forEach(driveItem => {
+                            let imgUrl = driveItem.url;
+                            if (imgUrl && imgUrl.includes('drive.google.com')) {
+                                const match = imgUrl.match(/[\/?&]id=([a-zA-Z0-9_-]+)/) || imgUrl.match(/file\/d\/([a-zA-Z0-9_-]+)/);
+                                if (match) imgUrl = `https://lh3.googleusercontent.com/d/${match[1]}`;
+                            }
 
-                        if (!newData.find(p => p.url === imgUrl)) {
-                            newData.unshift({
-                                id: Date.now() + Math.random(),
-                                title: driveItem.title || driveItem.name || '雲端新照片',
-                                url: imgUrl,
-                                category: PHOTO_CATEGORIES[0], 
-                                description: '',
-                                isPublished: false 
-                            });
-                            changed = true;
-                            newCount++;
+                            if (!newData.find(p => p.url === imgUrl)) {
+                                newData.unshift({
+                                    id: Date.now() + Math.random(),
+                                    title: driveItem.title || driveItem.name || '雲端新照片',
+                                    url: imgUrl,
+                                    category: PHOTO_CATEGORIES[0], 
+                                    description: '',
+                                    isPublished: false 
+                                });
+                                changed = true;
+                                newCount++;
+                            }
+                        });
+                        
+                        if (changed) {
+                            updatePhotoData(newData);
+                            if(isManual) alert(`✅ 同步完成！共新增 ${newCount} 張照片至後台資料庫。\n\n請在下方列表中編輯分類與描述，確認無誤後再點擊「發佈至前台」。`);
+                            return newData;
+                        } else {
+                            if(isManual) alert('✅ 雲端資料夾目前沒有發現新的照片。');
+                            return prev;
                         }
                     });
-                    
-                    if (changed) {
-                        syncToCloud('photoData', newData);
-                        if(isManual) alert(`✅ 同步完成！共新增 ${newCount} 張照片至後台資料庫。\n\n請在下方列表中編輯分類與描述，確認無誤後再點擊「發佈至前台」。`);
-                        return newData;
-                    } else {
-                        if(isManual) alert('✅ 雲端資料夾目前沒有發現新的照片。');
-                        return prev;
-                    }
-                });
-            } else {
-                if(isManual) alert('雲端資料夾目前為空。');
-            }
-        } catch (error) {
-            console.error('取得照片失敗:', error);
-            if(isManual) alert('❌ 同步失敗，請檢查網路或 API 網址設定。');
-        } finally {
-            setIsPhotoLoading(false);
-        }
+                } else {
+                    if(isManual) alert('雲端資料夾目前為空。');
+                }
+            })
+            .catch(error => {
+                console.error('取得照片失敗:', error);
+                if(isManual) alert('❌ 同步失敗，請檢查網路或 API 網址設定。');
+            })
+            .finally(() => {
+                setIsPhotoLoading(false);
+            });
       };
 
       useEffect(() => {
@@ -1973,10 +2021,8 @@
             {currentPage === 'album' && <AlbumPage category={selectedAlbum} photoData={photoData} onBack={() => navigate('home')} />}
             {currentPage === 'info' && <InfoPage />}
             {currentPage === 'faq' && <FaqPage faqData={faqData} />}
-            {/* 💡 傳入 onInteract 讓 Firebase 記錄試算次數 */}
             {currentPage === 'calc' && <CalcPage level={level} setLevel={setLevel} identity={identity} setIdentity={setIdentity} quantities={quantities} handleQtyChange={handleQtyChange} calcResults={calcResults} onInteract={handleCalcInteract} />}
             {currentPage === 'social' && <SocialPage onLineClick={handleLineClick} />}
-            {/* 💡 傳入 onLineClick 讓招募的 LINE 按鈕也能被追蹤 */}
             {currentPage === 'recruit' && <RecruitPage onLineClick={handleLineClick} />}
 
             {currentPage === 'admin' && isAdmin && (
@@ -2035,7 +2081,6 @@
                     <div className="bg-stone-800 p-5 rounded-[30px] group-hover:bg-orange-500 group-hover:text-white transition-all shadow-xl shrink-0"><MapPin size={32} className="shrink-0"/></div> 
                     <span className="whitespace-nowrap font-black leading-snug">彰化縣大城鄉西勢路30號</span>
                   </div>
-                  {/* 💡 加入追蹤 LINE 點擊次數的功能 */}
                   <div className="flex items-center gap-8 group hover:text-green-400 transition-all cursor-pointer" onClick={() => { handleLineClick(); window.open(lineUrl, '_blank'); }}>
                     <div className="bg-stone-800 p-5 rounded-[30px] group-hover:bg-green-500 group-hover:text-white transition-all shadow-xl shrink-0"><MessageCircle size={32}/></div> 
                     <span className="whitespace-nowrap font-black">LINE ID: @957jphho</span>
@@ -2082,7 +2127,6 @@
             <div className="hidden md:block bg-white text-green-600 px-5 py-3 rounded-[20px] shadow-2xl font-black text-sm border-2 border-green-100 animate-bounce relative">
               需要協助嗎？加入 LINE 諮詢 👋
             </div>
-            {/* 💡 浮動按鈕同樣加入點擊追蹤 */}
             <a href={lineUrl} target="_blank" rel="noopener noreferrer" onClick={handleLineClick} className="bg-green-500 text-white w-16 h-16 md:w-20 md:h-20 rounded-full shadow-[0_25px_50px_-12px_rgba(34,197,94,0.5)] flex items-center justify-center border-[4px] md:border-[6px] border-white hover:scale-110 transition-transform active:scale-95 shadow-2xl group">
               <MessageCircle className="w-8 h-8 md:w-10 md:h-10 animate-pulse group-hover:animate-none" />
             </a>
