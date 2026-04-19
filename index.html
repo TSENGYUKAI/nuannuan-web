@@ -5,6 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   
+  <!-- 💡 強制清除快取標籤，確保手機版一定能抓到最新更新 -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  
   <title>暖暖有限公司附設彰化縣私立暖暖居家長照機構 - 專業服務長照3.0</title>
   <meta name="description" content="暖暖有限公司附設彰化縣私立暖暖居家長照機構，由專業社工師帶領，深耕彰化大城，提供專業居家服務、交通接送、輔具改善及喘息服務。">
   
@@ -334,7 +339,7 @@
 
     // --- 子頁面組件 ---
 
-    // 💡 後台管理組件 (整合 Firebase 即時數據)
+    // 💡 後台管理組件
     const AdminPage = ({ fb, stats, loadingStats, newsData, setNewsData, photoData, setPhotoData, serviceAreas, setServiceAreas, faqData, setFaqData, isPhotoLoading, syncDrivePhotos, togglePublishPhoto, onLogout }) => {
       const [adminTab, setAdminTab] = useState('dashboard');
       
@@ -1301,14 +1306,18 @@
              <h3 className="text-3xl font-black text-gray-800 mb-16 underline decoration-orange-500/20 decoration-8 underline-offset-[-4px]">專業服務申請流程</h3>
              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 px-4">
                 {[
-                  { s: "1", t: "來電洽詢" }, { s: "2", t: "協助評估" }, 
-                  { s: "3", t: "到家訪問" }, { s: "4", t: "簽訂契約" }, { s: "5", t: "定期訪視" }
+                  { s: "1", t: "來電洽詢", d: "督導初步了解長輩狀況與基本需求，說明長照申請資格。" }, 
+                  { s: "2", t: "協助評估", d: "協助家屬申請服務，聯繫照管中心，進行失能等級(CMS)與需求評估。" }, 
+                  { s: "3", t: "到宅訪問", d: "督導親自到宅，確認居住安全環境並與家屬擬定後續服務安排。" }, 
+                  { s: "4", t: "簽訂契約", d: "詳細說明雙方權利義務、收費標準，確認排班時間並簽約。" }, 
+                  { s: "5", t: "服務上線", d: "居服員正式到宅服務，督導定期電訪與家訪，確保照顧品質。" }
                 ].map((s, idx) => (
                   <div key={idx} className="flex flex-col items-center relative group">
                     <div className="w-20 h-20 bg-white border-4 border-orange-100 rounded-[35px] flex items-center justify-center font-black text-3xl mb-6 shadow-sm group-hover:scale-110 group-hover:bg-orange-500 group-hover:text-white group-hover:border-orange-500 transition-all duration-300">
                       {s.s}
                     </div>
                     <h4 className="font-black text-gray-800 text-lg">{s.t}</h4>
+                    <p className="text-sm text-stone-500 font-bold mt-3 leading-relaxed px-2">{s.d}</p>
                     {idx < 4 && <div className="hidden md:block absolute top-10 -right-4 text-orange-200"><ChevronRight size={24}/></div>}
                   </div>
                 ))}
@@ -1675,7 +1684,7 @@
       const [fb, setFb] = useState(null);
       const APP_DOC_ID = 'nuannuan_official_web';
 
-      // 💡 Firebase 初始化與驗證設定
+      // 💡 Firebase 初始化與驗證設定 (加入全方位 .catch 防止報錯)
       useEffect(() => {
         let unsubscribeAuth;
         const initFb = () => {
@@ -1715,7 +1724,7 @@
                   }
                 });
             }).catch(err => {
-                console.warn('Auth Error: 系統嘗試作為訪客連線被拒絕，請確認已在 Firebase Authentication 開啟「匿名登入」功能。', err.message);
+                console.warn('Auth Error: 訪客連線被 Firebase 拒絕，請確認是否已在 Firebase 開啟「匿名登入」功能。', err.message);
                 setLoadingStats(false);
             });
 
@@ -1737,7 +1746,7 @@
         };
       }, []);
 
-      // 💡 雲端內容即時同步
+      // 💡 雲端內容即時同步 (加上 try catch 防止訪客被阻擋時跳錯)
       useEffect(() => {
         if (!fb || !fb.user) return;
         const contentDocRef = fb.doc(fb.db, 'artifacts', APP_DOC_ID, 'public', 'data', 'siteContent', 'main');
@@ -1750,13 +1759,14 @@
               if (data.serviceAreas) { setServiceAreas(data.serviceAreas); localStorage.setItem('nuannuan_areas_db', JSON.stringify(data.serviceAreas)); }
               if (data.faqData) { setFaqData(data.faqData); localStorage.setItem('nuannuan_faq_db', JSON.stringify(data.faqData)); }
            } else {
+              // 只有在系統確認您是管理員時，才會把本機資料初始化寫入雲端，以防訪客試圖寫入被阻擋而噴錯
               if (fb.user.email && ALLOWED_ADMIN_EMAILS.includes(fb.user.email)) {
                  fb.setDoc(contentDocRef, {
                     newsData: JSON.parse(localStorage.getItem('nuannuan_news_db')) || initialNewsList,
                     photoData: JSON.parse(localStorage.getItem('nuannuan_photos_db')) || initialPhotoList,
                     serviceAreas: JSON.parse(localStorage.getItem('nuannuan_areas_db')) || initialServiceAreas,
                     faqData: JSON.parse(localStorage.getItem('nuannuan_faq_db')) || initialFaqData
-                 }).catch(err => console.warn("無法初始化雲端內容 (資料庫規則可能未開放寫入)：", err.message));
+                 }).catch(err => console.warn("無法初始化雲端內容 (資料庫規則未開放)：", err.message));
               }
            }
         }, (err) => {
@@ -1766,7 +1776,7 @@
         return () => unsubscribe();
       }, [fb]);
 
-      // 💡 Firebase 追蹤器與即時數據拉取
+      // 💡 Firebase 追蹤器與即時數據拉取 (加上 try catch 確保被拒絕時安靜處理)
       useEffect(() => {
         if (fb) {
           trackEventRef.current = (eventName) => {
@@ -1788,6 +1798,7 @@
           
           let unsubStats = () => {};
           
+          // 僅允許管理員去拉取即時流量顯示，一般訪客不需要此連線
           if (fb.user && fb.user.email && ALLOWED_ADMIN_EMAILS.includes(fb.user.email)) {
              unsubStats = fb.onSnapshot(statsDocRef, (snap) => {
                 if (snap.exists()) setStats(snap.data());
@@ -2003,9 +2014,9 @@
             } else {
                setLoginError(`帳號 ${user.email} 無後台訪問權限。`);
                // 無權限者自動登出其 Google 帳號，並退回匿名身份維持數據追蹤
-               window.FirebaseModules.signOut(fbAuthInstance).then(() => {
-                  window.FirebaseModules.signInAnonymously(fbAuthInstance);
-               });
+               window.FirebaseModules.signOut(fbAuthInstance)
+                 .then(() => window.FirebaseModules.signInAnonymously(fbAuthInstance))
+                 .catch(e => console.warn(e));
             }
           }).catch((error) => {
             console.error("Google Login Error:", error);
@@ -2023,8 +2034,8 @@
       const handleSafeLogout = () => {
          if (fbAuthInstance && window.FirebaseModules) {
             window.FirebaseModules.signOut(fbAuthInstance).then(() => {
-               window.FirebaseModules.signInAnonymously(fbAuthInstance);
-            });
+               window.FirebaseModules.signInAnonymously(fbAuthInstance).catch(e => console.warn(e));
+            }).catch(e => console.warn(e));
          }
          setIsAdmin(false);
          navigate('home');
@@ -2116,7 +2127,7 @@
             {currentPage === 'privacy' && <PolicyPage 
               title="隱私權保護政策" 
               icon={<Lock size={36} />}
-              content={`歡迎您造訪「暖暖居家長照機構官方網站」（以下簡稱本網站），為了讓您能夠安心的使用本網站的各項服務與資訊，特此向您說明本網站的隱私權保護政策，以保障您的權益，請您詳閱下列內容：\n\n一、隱私權保護政策的適用範圍\n隱私權保護政策內容，包括本網站如何處理在您使用網站服務時收集到的個人識別資料。隱私權保護政策不適用於本網站以外的相關連結網站，也不適用於非本網站所委託 or 參與管理的人員。\n\n二、個人資料的蒐集、處理及利用方式\n• 當您造訪本網站或使用本網站所提供之功能服務時，我們將視該服務功能性質，請您提供必要的個人資料，並在該特定目的範圍內處理及利用您的個人資料；非經您書面同意，本網站不會將個人資料用於其他用途。\n• 本網站在您使用線上試算、客服信箱、問卷調查等互動性功能時，會保留您所提供的姓名、電子郵件地址、聯絡方式及使用時間等。\n• 於一般瀏覽時，伺服器會自行記錄相關行徑，console包括您使用連線設備的IP位址、使用時間、使用的瀏覽器、瀏覽及點選資料記錄等，做為我們增進網站服務的參考依據，此記錄為內部應用，決不對外公佈。\n\n三、資料之保護\n本網站主機均設有防火牆、防毒系統等相關的各項資訊安全設備及必要的安全防護措施，加以保護網站及您的個人資料採用嚴格的保護措施，只由經過授權的人員才能接觸您的個人資料，相關處理人員皆簽有保密合約，如有違反保密義務者，將受相關法律處分。\n\n四、網站對外的相關連結\n本網站的網頁提供其他網站的網路連結，您也可經由本網站所提供的連結，點選進入其他網站。但該連結網站不適用本網站的隱私權保護政策，您必須參考該連結網站中的隱私權保護政策。\n\n五、隱私權保護政策之修正\n本網站隱私權保護政策將因應需求隨時進行修正，修正後的條款將刊登於網站上。`} 
+              content={`歡迎您造訪「暖暖居家長照機構官方網站」（以下簡稱本網站），為了讓您能夠安心的使用本網站的各項服務與資訊，特此向您說明本網站的隱私權保護政策，以保障您的權益，請您詳閱下列內容：\n\n一、隱私權保護政策的適用範圍\n隱私權保護政策內容，包括本網站如何處理在您使用網站服務時收集到的個人識別資料。隱私權保護政策不適用於本網站以外的相關連結網站，也不適用於非本網站所委託 or 參與管理的人員。\n\n二、個人資料的蒐集、處理及利用方式\n• 當您造訪本網站或使用本網站所提供之功能服務時，我們將視該服務功能性質，請您提供必要的個人資料，並在該特定目的範圍內處理及利用您的個人資料；非經您書面同意，本網站不會將個人資料用於其他用途。\n• 本網站在您使用線上試算、客服信箱、問卷調查等互動性功能時，會保留您所提供的姓名、電子郵件地址、聯絡方式及使用時間等。\n• 於一般瀏覽時，伺服器會自行記錄相關行徑，包括您使用連線設備的IP位址、使用時間、使用的瀏覽器、瀏覽及點選資料記錄等，做為我們增進網站服務的參考依據，此記錄為內部應用，決不對外公佈。\n\n三、資料之保護\n本網站主機均設有防火牆、防毒系統等相關的各項資訊安全設備及必要的安全防護措施，加以保護網站及您的個人資料採用嚴格的保護措施，只由經過授權的人員才能接觸您的個人資料，相關處理人員皆簽有保密合約，如有違反保密義務者，將受相關法律處分。\n\n四、網站對外的相關連結\n本網站的網頁提供其他網站的網路連結，您也可經由本網站所提供的連結，點選進入其他網站。但該連結網站不適用本網站的隱私權保護政策，您必須參考該連結網站中的隱私權保護政策。\n\n五、隱私權保護政策之修正\n本網站隱私權保護政策將因應需求隨時進行修正，修正後的條款將刊登於網站上。`} 
             />}
             {currentPage === 'security' && <PolicyPage 
               title="資訊安全政策" 
