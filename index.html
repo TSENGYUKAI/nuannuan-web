@@ -1331,6 +1331,11 @@
       const [openQuestionId, setOpenQuestionId] = useState(null);
       const [activeCategory, setActiveCategory] = useState(faqData[0]?.category || '');
 
+      // 💡 加入強制置頂指令
+      useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, []);
+
       useEffect(() => {
         if (!activeCategory && faqData.length > 0) setActiveCategory(faqData[0].category);
       }, [faqData]);
@@ -1973,16 +1978,18 @@
         updatePhotoData(newData);
       };
 
+      // 💡 優化導航置頂時間差，確保所有頁面切換都會平滑置頂
       const navigate = (page) => {
         setCurrentPage(page);
         setIsMenuOpen(false);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
       };
 
       const navigateToAlbum = (category) => {
         setSelectedAlbum(category);
         setCurrentPage('album');
         setIsMenuOpen(false);
+        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
       };
 
       const handleAdminLogin = () => {
